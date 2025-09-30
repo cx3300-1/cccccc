@@ -8928,6 +8928,17 @@
     font-size: 15px;
     line-height: 1.6;
     color: #333;
+    
+    /* --- ▼▼▼ 核心修改就在这里 ▼▼▼ --- */
+
+    /* 1. 设置一个最大高度。我们使用 vh (视窗高度) 单位，
+       让弹窗最大不超过屏幕高度的60%，以适应不同尺寸的手机。 */
+    max-height: 60vh; 
+    
+    /* 2. 当内容超出这个最大高度时，自动显示垂直滚动条。 */
+    overflow-y: auto; 
+
+    /* --- ▲▲▲ 修改结束 ▲▲▲ --- */
 }
 .update-notice-footer {
     border-top: 1px solid #dbdbdb;
