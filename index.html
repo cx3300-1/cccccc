@@ -19752,8 +19752,10 @@ async function runBackgroundSimulationTick() {
     }
 }
 // ▲▲▲ 替换结束 ▲▲▲
+// ▼▼▼ 【最终修复版】请用这个全新的函数，完整替换旧的 generateNpcComments 函数 ▼▼▼
+
 /**
- * 【全新】调用AI为NPC批量生成评论
+ * 【全新 | 已注入角色上下文】调用AI为NPC批量生成评论
  * @param {object} npc - NPC对象 { name, persona, ... }
  * @param {Array<object>} tasks - 待处理的帖子对象数组
  * @returns {Promise<Array|null>} - 返回AI生成的评论对象数组，或在失败时返回null
@@ -19765,15 +19767,42 @@ async function generateNpcComments(npc, tasks) {
         return null;
     }
 
-    // 将任务（帖子列表）格式化为AI易于理解的文本
+    // --- 核心修复 1: 在这里构建完整的角色上下文 ---
+    let charactersContext = "# 你的互动对象 (用户和其他角色)\n";
+    
+    // a. 获取用户的信息
+    const userNickname = state.qzoneSettings.nickname || '我';
+    const userPersona = state.chats[Object.keys(state.chats)[0]]?.settings.myPersona || '(未设置)';
+    charactersContext += `- **${userNickname} (用户)**: ${userPersona}\n`;
+
+    // b. 获取所有与此NPC关联的主要AI角色的信息
+    if (npc.associatedWith && npc.associatedWith.length > 0) {
+        npc.associatedWith.forEach(charId => {
+            const char = state.chats[charId];
+            if (char && !char.isGroup) {
+                charactersContext += `- **${char.name} (本名: ${char.originalName})**: ${char.settings.aiPersona}\n`;
+            }
+        });
+    }
+    // --- 修复结束 ---
+
+
+    // (将帖子格式化的逻辑保持不变)
     const tasksString = tasks.map(post => {
+        const authorDisplayName = getDisplayNameByOriginalName(post.authorOriginalName || post.authorId);
         const commentsString = (post.comments || [])
-            .map(c => `- **${getDisplayNameByOriginalName(c.commenterName)}** (本名: ${c.commenterName}): ${c.text}`)
-            .join('\n');
+            .map(c => {
+                 if (typeof c === 'object' && c.commenterName) {
+                    const commenterDisplayName = getDisplayNameByOriginalName(c.commenterName);
+                    return `- **${commenterDisplayName}**: ${c.text}`;
+                }
+                return `- ${c}`; // 兼容旧格式
+            }).join('\n');
+
         return `
 ---
 ### 帖子ID: ${post.id}
-- **作者**: ${getDisplayNameByOriginalName(post.authorOriginalName || post.authorId)}
+- **作者**: ${authorDisplayName}
 - **内容摘要**: ${(post.content || post.publicText || '').substring(0, 150)}...
 - **已有评论**:
 ${commentsString || '(暂无评论)'}
@@ -19781,36 +19810,37 @@ ${commentsString || '(暂无评论)'}
 `;
     }).join('\n');
 
+    // --- 核心修复 2: 将我们刚刚构建的 charactersContext 注入到系统指令中 ---
     const systemPrompt = `
 # 你的任务
 你是一个虚拟社区的AI评论员。你的核心任务是扮演角色“${npc.name}”，并根据其人设，为你下面提供的【每一篇】帖子撰写评论或回复。你的目标是让社区互动看起来更真实、更活跃。
 
 # 核心规则
-1.  **【【【数量铁律 (最高优先级!)】】】**: 你本次任务【必须】生成【总共2到5条】评论。你可以自由分配这些评论到不同的帖子上。
-2.  **【角色扮演】**: 你的每一条评论都【必须】严格符合你的角色设定。
-3.  **【互动逻辑 (最重要!)】**:
+1.  **【角色扮演】**: 你的每一条评论都【必须】严格符合你的角色设定。
+2.  **【互动逻辑 (最重要!)】**:
     -   仔细阅读每篇帖子的“已有评论”。如果有人回复了你或提到了你，你【必须】优先回复他们。
     -   如果帖子很有趣但没人与你互动，你可以发表一条全新的评论。
-    -   你可以在一篇帖子里回复多个人，也可以在多篇帖子里分别发表评论，只要总数达标即可。
-4.  **【格式铁律 (最高优先级)】**: 
+3.  **【格式铁律 (最高优先级)】**: 
     -   你的回复【必须且只能】是一个JSON数组格式的字符串。
-    -   你的回复必须以 \`[\` 开始，并以 \`]\` 结束。
-    -   【绝对禁止】在JSON数组前后添加任何多余的文字、解释或 markdown 标记 (如 \`\`\`json)。
     -   数组中的每个元素都代表一条评论，格式【必须】是以下两种之一：
       -   **发表新评论**: \`{"postId": 帖子ID, "commentText": "你的新评论内容。"}\`
       -   **回复他人评论**: \`{"postId": 帖子ID, "replyTo": "被回复者的【本名】", "commentText": "你的回复内容。"}\`
-
+4.  **【数量铁律 (最高优先级!)】**: 你本次任务【必须】生成【总共2到5条】评论。你可以自由分配这些评论到不同的帖子上。
 # 你的角色设定
 - **昵称**: ${npc.name}
 - **人设**: ${npc.persona}
 
+${charactersContext} 
+
 # 待处理的帖子列表
 ${tasksString}
 
-现在，请严格遵守所有规则，开始为这些帖子撰写总共2-5条评论。
+现在，请严格遵守所有规则，开始为这些帖子撰写评论。
 `;
+    // --- 修复结束 ---
 
     try {
+        // (后续的API调用逻辑保持不变)
         const messagesForApi = [{ role: 'user', content: "请根据你的设定，为以上帖子生成评论。" }];
         let isGemini = proxyUrl.includes('generativelanguage');
         let geminiConfig = toGeminiRequestData(model, apiKey, systemPrompt, messagesForApi);
@@ -19840,7 +19870,7 @@ ${tasksString}
         console.error(`为NPC "${npc.name}" 生成评论失败:`, error);
         return null;
     }
-}       
+}    
         // ▼▼▼ 【最终修复版】请用这个全新的函数，完整替换旧的 triggerInactiveAiAction ▼▼▼
         /**
          * 【V3.0 | 记忆增强版】AI在非活跃状态下的独立行动决策
@@ -39846,6 +39876,7 @@ document.getElementById('npc-avatar-input').addEventListener('change', (event) =
 <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
 </body>
 </html>
+
 
 
 
