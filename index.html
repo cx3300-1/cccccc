@@ -10009,18 +10009,6 @@ input, textarea, select {
                     <input type="number" id="npc-action-cooldown-input" min="1" value="15" style="width: 80px; text-align: center;">
                 </div>
 <!-- ▲▲▲ 新增代码粘贴结束 ▲▲▲ -->
-<div class="form-group">
-    <label>关联世界书 (可多选)</label>
-    <div class="custom-multiselect">
-        <div class="select-box" id="npc-world-book-select-box">
-            <span class="selected-options-text">-- 点击选择 --</span>
-            <span class="arrow-down">▼</span>
-        </div>
-        <div id="npc-world-book-checkboxes-container" class="checkboxes-container">
-            <!-- 世界书选项将由JS动态生成 -->
-        </div>
-    </div>
-</div>
             <div class="form-group">
                 <label>关联的角色 (NPC会去评论这些角色的动态)</label>
                 <div id="npc-association-list" style="max-height: 150px; overflow-y: auto; background: #f9f9f9; padding: 10px; border-radius: 8px;">
@@ -14803,144 +14791,107 @@ async function renderNpcListScreen() {
     });
 }
 
-// ▼▼▼ 【请用这个全新版本】替换旧的 openNpcEditor 函数 ▼▼▼
-async function openNpcEditor(npcId = null) {
-    editingNpcId = npcId;
-    const modal = document.getElementById('npc-editor-modal');
-    const titleEl = document.getElementById('npc-editor-title');
-    const nameInput = document.getElementById('npc-name-input');
-    const personaInput = document.getElementById('npc-persona-input');
-    const avatarPreview = document.getElementById('npc-avatar-preview');
-    const associationListEl = document.getElementById('npc-association-list');
-    const activitySwitch = document.getElementById('npc-background-activity-switch');
-    const cooldownInput = document.getElementById('npc-action-cooldown-input');
-
-    // --- ▼▼▼ 核心修改 1：获取世界书相关的新元素 ▼▼▼ ---
-    const worldBookSelectBox = document.getElementById('npc-world-book-select-box');
-    const worldBookCheckboxesContainer = document.getElementById('npc-world-book-checkboxes-container');
-    worldBookCheckboxesContainer.innerHTML = ''; // 清空旧的世界书选项
-    // --- ▲▲▲ 修改结束 ▲▲▲ ---
-
-    associationListEl.innerHTML = ''; 
-    associationListEl.innerHTML += `<label><input type="checkbox" value="user"> ${state.qzoneSettings.nickname || '我'} (用户)</label>`;
-    Object.values(state.chats).filter(c => !c.isGroup).forEach(char => {
-        associationListEl.innerHTML += `<label><input type="checkbox" value="${char.id}"> ${char.name} (角色)</label>`;
-    });
-
-    // --- ▼▼▼ 核心修改 2：加载并渲染世界书列表 ▼▼▼ ---
-    const allBooks = await db.worldBooks.toArray();
-    if (allBooks.length > 0) {
-        allBooks.forEach(book => {
-            const label = document.createElement('label');
-            label.innerHTML = `<input type="checkbox" value="${book.id}"> ${book.name}`;
-            worldBookCheckboxesContainer.appendChild(label);
-        });
-    } else {
-        worldBookCheckboxesContainer.innerHTML = '<p style="padding: 10px; color: #888; text-align: center;">没有可用的世界书</p>';
-    }
-    // --- ▲▲▲ 修改结束 ▲▲▲ ---
-
-    if (npcId) {
-        titleEl.textContent = '编辑 NPC';
-        const npc = await db.npcs.get(npcId);
-        if (npc) {
-            nameInput.value = npc.name;
-            personaInput.value = npc.persona;
-            avatarPreview.src = npc.avatar || defaultGroupMemberAvatar;
-            activitySwitch.checked = npc.enableBackgroundActivity !== false; 
-            cooldownInput.value = npc.actionCooldownMinutes || 15;
-
-            if (npc.associatedWith && Array.isArray(npc.associatedWith)) {
-                npc.associatedWith.forEach(id => {
-                    const checkbox = associationListEl.querySelector(`input[value="${id}"]`);
-                    if (checkbox) checkbox.checked = true;
-                });
-            }
-            
-            // --- ▼▼▼ 核心修改 3：勾选已关联的世界书 ▼▼▼ ---
-            if (npc.linkedWorldBookIds && Array.isArray(npc.linkedWorldBookIds)) {
-                npc.linkedWorldBookIds.forEach(bookId => {
-                    const checkbox = worldBookCheckboxesContainer.querySelector(`input[value="${bookId}"]`);
-                    if (checkbox) checkbox.checked = true;
-                });
-            }
-            // --- ▲▲▲ 修改结束 ▲▲▲ ---
-        }
-    } else {
-        titleEl.textContent = '添加 NPC';
-        nameInput.value = '';
-        personaInput.value = '';
-        avatarPreview.src = defaultGroupMemberAvatar;
-        activitySwitch.checked = true;
-        cooldownInput.value = 15;
-        const userCheckbox = associationListEl.querySelector('input[value="user"]');
-        if (userCheckbox) userCheckbox.checked = true;
-    }
-    
-    // --- ▼▼▼ 核心修改 4：更新世界书选择器的显示文本 ▼▼▼ ---
-    updateNpcWorldBookSelectionDisplay();
-    // --- ▲▲▲ 修改结束 ▲▲▲ ---
-
-    modal.classList.add('visible');
-}
-// ▲▲▲ 替换结束 ▲▲▲
-// ▼▼▼ 【全新】请将这个新函数粘贴到 openNpcEditor 的上方或下方 ▼▼▼
 /**
- * 【全新】更新NPC编辑器中世界书选择器的显示文本
- */
-function updateNpcWorldBookSelectionDisplay() {
-    const container = document.getElementById('npc-world-book-checkboxes-container');
-    const displayText = document.querySelector('#npc-world-book-select-box .selected-options-text');
-    const checkedBoxes = container.querySelectorAll('input:checked');
-    
-    if (checkedBoxes.length === 0) {
-        displayText.textContent = '-- 点击选择 --';
-    } else if (checkedBoxes.length > 2) {
-        displayText.textContent = `已选择 ${checkedBoxes.length} 本世界书`;
-    } else {
-        displayText.textContent = Array.from(checkedBoxes).map(cb => cb.parentElement.textContent.trim()).join(', ');
-    }
-}
-// ▲▲▲ 新增函数结束 ▲▲▲
-// ▼▼▼ 【请用这个全新版本】替换旧的 saveNpc 函数 ▼▼▼
-async function saveNpc() {
-    const name = document.getElementById('npc-name-input').value.trim();
-    const persona = document.getElementById('npc-persona-input').value.trim();
-    if (!name || !persona) {
-        alert("NPC的昵称和人设都不能为空！");
-        return;
-    }
+         * 【已更新】打开NPC编辑器（用于新建或编辑）
+         * @param {number|null} npcId - 如果是编辑，则传入ID；如果是新建，则为null
+         */
+        async function openNpcEditor(npcId = null) {
+            editingNpcId = npcId;
+            const modal = document.getElementById('npc-editor-modal');
+            const titleEl = document.getElementById('npc-editor-title');
+            const nameInput = document.getElementById('npc-name-input');
+            const personaInput = document.getElementById('npc-persona-input');
+            const avatarPreview = document.getElementById('npc-avatar-preview');
+            const associationListEl = document.getElementById('npc-association-list');
+            
+            // 【核心新增】获取新添加的开关和输入框元素
+            const activitySwitch = document.getElementById('npc-background-activity-switch');
+            const cooldownInput = document.getElementById('npc-action-cooldown-input');
+            
+            associationListEl.innerHTML = ''; // 清空旧的关联列表
 
-    const selectedAssociations = Array.from(document.querySelectorAll('#npc-association-list input:checked')).map(cb => cb.value);
-    const enableBackgroundActivity = document.getElementById('npc-background-activity-switch').checked;
-    const actionCooldownMinutes = parseInt(document.getElementById('npc-action-cooldown-input').value) || 15;
+            // 生成可关联的角色列表 (逻辑不变)
+            associationListEl.innerHTML += `<label><input type="checkbox" value="user"> ${state.qzoneSettings.nickname || '我'} (用户)</label>`;
+            Object.values(state.chats).filter(c => !c.isGroup).forEach(char => {
+                associationListEl.innerHTML += `<label><input type="checkbox" value="${char.id}"> ${char.name} (角色)</label>`;
+            });
 
-    // --- ▼▼▼ 核心修改：获取选中的世界书ID ▼▼▼ ---
-    const selectedWorldBookIds = Array.from(document.querySelectorAll('#npc-world-book-checkboxes-container input:checked')).map(cb => cb.value);
-    // --- ▲▲▲ 修改结束 ▲▲▲ ---
+            if (npcId) {
+                // 编辑模式
+                titleEl.textContent = '编辑 NPC';
+                const npc = await db.npcs.get(npcId);
+                if (npc) {
+                    nameInput.value = npc.name;
+                    personaInput.value = npc.persona;
+                    avatarPreview.src = npc.avatar || defaultGroupMemberAvatar;
 
-    const npcData = {
-        name,
-        persona,
-        avatar: document.getElementById('npc-avatar-preview').src,
-        associatedWith: selectedAssociations,
-        enableBackgroundActivity: enableBackgroundActivity,
-        actionCooldownMinutes: actionCooldownMinutes,
-        // --- ▼▼▼ 核心修改：将世界书ID存入数据对象 ▼▼▼ ---
-        linkedWorldBookIds: selectedWorldBookIds
-        // --- ▲▲▲ 修改结束 ▲▲▲ ---
-    };
+                    // 【核心新增】读取并应用已保存的设置
+                    // 使用 !== false 判断，确保新创建的、没有该字段的NPC默认为开启
+                    activitySwitch.checked = npc.enableBackgroundActivity !== false; 
+                    cooldownInput.value = npc.actionCooldownMinutes || 15;
 
-    if (editingNpcId) {
-        await db.npcs.update(editingNpcId, npcData);
-    } else {
-        await db.npcs.add(npcData);
-    }
+                    if (npc.associatedWith && Array.isArray(npc.associatedWith)) {
+                        npc.associatedWith.forEach(id => {
+                            const checkbox = associationListEl.querySelector(`input[value="${id}"]`);
+                            if (checkbox) checkbox.checked = true;
+                        });
+                    }
+                }
+            } else {
+                // 新建模式
+                titleEl.textContent = '添加 NPC';
+                nameInput.value = '';
+                personaInput.value = '';
+                avatarPreview.src = defaultGroupMemberAvatar;
 
-    document.getElementById('npc-editor-modal').classList.remove('visible');
-    await renderNpcListScreen();
-}
-// ▲▲▲ 替换结束 ▲▲▲
+                // 【核心新增】为新NPC设置默认值
+                activitySwitch.checked = true; // 默认开启
+                cooldownInput.value = 15;     // 默认15分钟
+
+                const userCheckbox = associationListEl.querySelector('input[value="user"]');
+                if (userCheckbox) userCheckbox.checked = true;
+            }
+
+            modal.classList.add('visible');
+        }
+
+        /**
+         * 【已更新】保存NPC信息
+         */
+        async function saveNpc() {
+            const name = document.getElementById('npc-name-input').value.trim();
+            const persona = document.getElementById('npc-persona-input').value.trim();
+            if (!name || !persona) {
+                alert("NPC的昵称和人设都不能为空！");
+                return;
+            }
+
+            const selectedAssociations = Array.from(document.querySelectorAll('#npc-association-list input:checked')).map(cb => cb.value);
+
+            // 【核心新增】从表单中获取新设置的值
+            const enableBackgroundActivity = document.getElementById('npc-background-activity-switch').checked;
+            const actionCooldownMinutes = parseInt(document.getElementById('npc-action-cooldown-input').value) || 15;
+
+            // 【核心新增】将新设置添加到要保存的数据对象中
+            const npcData = {
+                name,
+                persona,
+                avatar: document.getElementById('npc-avatar-preview').src,
+                associatedWith: selectedAssociations,
+                enableBackgroundActivity: enableBackgroundActivity,
+                actionCooldownMinutes: actionCooldownMinutes
+            };
+
+            if (editingNpcId) {
+                // 更新时，不会覆盖 lastActionTimestamp 字段，这很重要
+                await db.npcs.update(editingNpcId, npcData);
+            } else {
+                await db.npcs.add(npcData);
+            }
+
+            document.getElementById('npc-editor-modal').classList.remove('visible');
+            await renderNpcListScreen();
+        }
 
 /**
  * 删除NPC
@@ -19541,23 +19492,12 @@ async function runBackgroundSimulationTick() {
                         const post = await db.qzonePosts.get(comment.postId);
                         if (post) {
                             if (!post.comments) post.comments = [];
-                            if (comment.stickerUrl && comment.stickerMeaning) {
-                                // 这是表情评论
-                                post.comments.push({
-                                    commenterName: npc.name,
-                                    text: comment.stickerUrl,
-                                    meaning: comment.stickerMeaning,
-                                    replyTo: null,
-                                    timestamp: Date.now() + Math.random()
-                                });
-                            } else if (comment.commentText) {
                             post.comments.push({
                                 commenterName: npc.name,
                                 text: comment.commentText,
                                 replyTo: comment.replyTo || null,
                                 timestamp: Date.now() + Math.random()
                             });
-                          }
                             await db.qzonePosts.update(comment.postId, { comments: post.comments });
                         }
                     }
@@ -19589,28 +19529,7 @@ async function generateNpcComments(npc, tasks) {
         console.error("NPC行动失败：API未配置。");
         return null;
     }
-    // --- ▼▼▼ 核心修改 1：构建世界书上下文 ▼▼▼ ---
-    let worldBookContext = '';
-    if (npc.linkedWorldBookIds && npc.linkedWorldBookIds.length > 0) {
-        const linkedContents = npc.linkedWorldBookIds.map(bookId => {
-            const worldBook = state.worldBooks.find(wb => wb.id === bookId);
-            if (!worldBook || !Array.isArray(worldBook.content)) return '';
-            const formattedEntries = worldBook.content
-                .filter(entry => entry.enabled !== false)
-                .map(entry => {
-                    let entryString = `\n### 条目: ${entry.comment || '无备注'}\n`;
-                    if (entry.keys.length > 0) entryString += `**关键词:** ${entry.keys.join(', ')}\n`;
-                    entryString += `**内容:**\n${entry.content}`;
-                    return entryString;
-                }).join('');
-            return formattedEntries ? `\n\n## 世界书《${worldBook.name}》设定:\n${formattedEntries}` : '';
-        }).filter(Boolean).join('');
-        
-        if (linkedContents) {
-            worldBookContext = `\n\n# 世界观设定 (你必须严格遵守)\n${linkedContents}`;
-        }
-    }
-    // --- ▲▲▲ 修改结束 ▲▲▲ ---
+
     // 将任务（帖子列表）格式化为AI易于理解的文本
     const tasksString = tasks.map(post => {
         const commentsString = (post.comments || [])
@@ -19632,7 +19551,7 @@ ${commentsString || '(暂无评论)'}
 你是一个虚拟社区的AI评论员。你的核心任务是扮演角色“${npc.name}”，并根据其人设，为你下面提供的【每一篇】帖子撰写评论或回复。你的目标是让社区互动看起来更真实、更活跃。
 
 # 核心规则
-1.  **数量铁律 (最高优先级!)】**: 你本次任务【必须】生成【总共2到5条】评论。你可以自由分配这些评论到不同的帖子上。
+1.  **【【【数量铁律 (最高优先级!)】】】**: 你本次任务【必须】生成【总共2到5条】评论。你可以自由分配这些评论到不同的帖子上。
 2.  **【角色扮演】**: 你的每一条评论都【必须】严格符合你的角色设定。
 3.  **【互动逻辑 (最重要!)】**:
     -   仔细阅读每篇帖子的“已有评论”。如果有人回复了你或提到了你，你【必须】优先回复他们。
@@ -19645,7 +19564,7 @@ ${commentsString || '(暂无评论)'}
     -   数组中的每个元素都代表一条评论，格式【必须】是以下两种之一：
       -   **发表新评论**: \`{"postId": 帖子ID, "commentText": "你的新评论内容。"}\`
       -   **回复他人评论**: \`{"postId": 帖子ID, "replyTo": "被回复者的【本名】", "commentText": "你的回复内容。"}\`
-     -   **发表表情评论**: '{"postId": 帖子ID, "stickerUrl": "https://...表情URL...", "stickerMeaning": "这个表情的意思，比如'开心'"}'
+
 # 你的角色设定
 - **昵称**: ${npc.name}
 - **人设**: ${npc.persona}
@@ -39303,13 +39222,7 @@ document.getElementById('npc-avatar-input').addEventListener('change', (event) =
         reader.readAsDataURL(file);
     }
 });
-document.getElementById('npc-world-book-select-box').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const container = document.getElementById('npc-world-book-checkboxes-container');
-    container.classList.toggle('visible');
-    e.currentTarget.classList.toggle('expanded');
-});
-document.getElementById('npc-world-book-checkboxes-container').addEventListener('change', updateNpcWorldBookSelectionDisplay);
+
 
 
 
