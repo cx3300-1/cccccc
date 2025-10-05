@@ -27,6 +27,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+     <script src="x-social-app.js" defer></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
@@ -406,7 +407,45 @@
         #sticker-panel-header .title { font-weight: 600; }
         #sticker-panel-header .panel-btn { font-size: 16px; padding: 5px 10px; cursor: pointer; color: var(--accent-color); }
         #sticker-grid { flex-grow: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; }
-        .sticker-item { position: relative; aspect-ratio: 1 / 1; background-color: white; border-radius: 10px; background-size: contain; background-repeat: no-repeat; background-position: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* ▼▼▼ 【表情含义显示】请用这整块代码，替换掉您现有的 .sticker-item 样式 ▼▼▼ */
+
+/* 1. 表情项的总容器，现在是flex布局 */
+.sticker-item {
+    position: relative;
+    display: flex;
+    flex-direction: column; /* 垂直排列图片和文字 */
+    align-items: center;    /* 水平居中 */
+    gap: 6px;               /* 图片和文字之间的间距 */
+    cursor: pointer;
+}
+
+/* 2. 表情图片容器 (这是新增的) */
+.sticker-image-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;    /* 保持正方形 */
+    background-color: white;
+    border-radius: 10px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 3. 表情含义文本 (这是新增的) */
+.sticker-name {
+    font-size: 12px;           /* 字体大小 */
+    color: var(--text-secondary); /* 使用次要文字颜色 */
+    width: 100%;               /* 宽度撑满，为省略号做准备 */
+    text-align: center;        /* 文字居中 */
+    
+    /* --- 这就是实现“超出省略号”的核心代码 --- */
+    white-space: nowrap;       /* 强制不换行 */
+    overflow: hidden;          /* 隐藏超出的部分 */
+    text-overflow: ellipsis;   /* 将超出的部分显示为省略号 */
+    /* --- 核心代码结束 --- */
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
         .sticker-item .delete-btn { display: none; position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; background-color: #ff3b30; color: white; border-radius: 50%; text-align: center; line-height: 20px; font-size: 14px; cursor: pointer; border: 2px solid white; }
         #input-actions-wrapper { position: static; display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; }
         #wait-reply-btn { position: static; bottom: auto; right: auto; width: auto; height: 40px; padding: 0 10px; border-radius: 20px; display: flex; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: opacity 0.2s, transform 0.1s; cursor: pointer;}
@@ -9044,6 +9083,79 @@ input, textarea, select {
 #phone-screen.dark-mode #npc-list-view {
     background-color: #000;
 }
+       /* 悬浮X Logo样式 */
+        #floating-x-logo {
+          position: fixed;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 50px;
+          height: 50px;
+          background: linear-gradient(135deg, #1d9bf0 0%, #0ea5ff 100%);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          cursor: pointer;
+          box-shadow: 0 4px 20px rgba(29, 155, 240, 0.3);
+          z-index: 999;
+          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .floating-x-hidden {
+          transform: translateY(-50%) translateX(100px);
+          opacity: 0;
+        }
+
+        .floating-x-visible {
+          transform: translateY(-50%) translateX(0);
+          opacity: 1;
+        }
+
+        #floating-x-logo:hover {
+          transform: translateY(-50%) scale(1.1);
+          box-shadow: 0 6px 25px rgba(29, 155, 240, 0.4);
+        }
+
+        #floating-x-logo:active {
+          transform: translateY(-50%) scale(0.95);
+        }
+/* ▼▼▼ 【全新】这是为“围观群聊”操作按钮添加的样式 ▼▼▼ */
+
+/* 1. 让“围观中”文字和按钮容器垂直排列 */
+#chat-lock-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* 在文字和按钮之间增加间距 */
+}
+
+/* 2. 按钮的容器，使用Flex布局让它们水平排列 */
+.spectator-actions-container {
+    display: flex;
+    gap: 12px; /* 按钮之间的间距 */
+    align-items: center;
+}
+
+/* 3. 为次要按钮（重Roll/剪辑）创建一个新样式 */
+#chat-lock-content .lock-action-btn.secondary {
+    background-color: transparent; /* 透明背景 */
+    color: var(--accent-color);   /* 使用主题色文字 */
+    border: 1px solid var(--accent-color); /* 同样颜色的边框 */
+    padding: 8px 18px; /* 调整内边距，让它比主按钮小一点 */
+    font-size: 14px;
+}
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】这是为“围观群聊”SVG图标按钮添加的样式 ▼▼▼ */
+
+.spectator-actions-container .lock-action-btn.secondary svg {
+    width: 20px;  /* 设置图标宽度 */
+    height: 20px; /* 设置图标高度 */
+    stroke: currentColor; /* 关键：让图标颜色自动继承按钮的文字颜色 */
+}
+
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -9134,6 +9246,13 @@ input, textarea, select {
     <div class="icon-bg-desktop"><img id="icon-img-tutorial" src="https://i.postimg.cc/d10GjC4g/IMG-7302.jpg" alt="教程"></div>
     <span class="label">教程</span>
 </div>
+     <!-- 悬浮X Logo - 只在主页面显示 -->
+      <div id="floating-x-logo" class="floating-x-hidden">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+          <path
+            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      </div>
                 </div>
             </div>
         </div>
@@ -11769,6 +11888,81 @@ input, textarea, select {
     <input type="file" id="ai-avatar-upload-input" accept="image/*" hidden>
     <input type="file" id="group-avatar-upload-input" accept="image/*" hidden>
     <script>
+// ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼
+if (!Array.prototype.findLastIndex) {
+  Object.defineProperty(Array.prototype, 'findLastIndex', {
+    value: function(predicate) {
+      if (this == null) {
+        throw new TypeError('Cannot read property \'findLastIndex\' of null or undefined');
+      }
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+      let o = Object(this);
+      let len = o.length >>> 0;
+      let thisArg = arguments[1];
+      let k = len - 1;
+      while (k >= 0) {
+        let kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return k;
+        }
+        k--;
+      }
+      return -1;
+    },
+    configurable: true,
+    writable: true
+  });
+}
+        // 双击检测变量
+        let homeScreenTapCount = 0;
+        let homeScreenTapTimer = null;
+       document.addEventListener('DOMContentLoaded', function () {
+          const homeScreen = document.getElementById('home-screen');
+          const floatingXLogo = document.getElementById('floating-x-logo');
+
+          if (homeScreen && floatingXLogo) {
+            // 双击事件监听
+            homeScreen.addEventListener('click', function (e) {
+              // 避免与其他元素的点击事件冲突
+              if (e.target.closest('.desktop-app-icon') || e.target.closest('#floating-x-logo')) {
+                return;
+              }
+
+              homeScreenTapCount++;
+
+              if (homeScreenTapCount === 1) {
+                homeScreenTapTimer = setTimeout(function () {
+                  homeScreenTapCount = 0;
+                }, 300);
+              } else if (homeScreenTapCount === 2) {
+                clearTimeout(homeScreenTapTimer);
+                homeScreenTapCount = 0;
+
+                // 显示悬浮X Logo
+                floatingXLogo.classList.remove('floating-x-hidden');
+                floatingXLogo.classList.add('floating-x-visible');
+
+                // 3秒后自动隐藏
+                setTimeout(function () {
+                  floatingXLogo.classList.remove('floating-x-visible');
+                  floatingXLogo.classList.add('floating-x-hidden');
+                }, 3000);
+              }
+            });
+
+            // X Logo点击事件
+            floatingXLogo.addEventListener('click', function (e) {
+              e.stopPropagation();
+              showScreen('x-social-screen');
+              // 点击后隐藏logo
+              floatingXLogo.classList.remove('floating-x-visible');
+              floatingXLogo.classList.add('floating-x-hidden');
+            });
+          }
+        });
+
         // ... 其他全局变量
         let activeMessageTimestamp = null;
         let activeTransferTimestamp = null; // <-- 确保这行在这里，并且只有一行
@@ -12876,7 +13070,7 @@ const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/noti
             });
         });
         // ▲▲▲ 替换结束 ▲▲▲
-        
+window.db = db;        
                 // ===================================================================
                 // 3. 所有功能函数定义
                 // ===================================================================
@@ -12889,6 +13083,7 @@ const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/noti
                     if (screenId === 'api-settings-screen') window.renderApiSettingsProxy();
                     if (screenId === 'wallpaper-screen') window.renderWallpaperScreenProxy();
                     if (screenId === 'world-book-screen') window.renderWorldBookScreenProxy();
+                    if (screenId === 'x-social-screen') window.renderXSocialScreenProxy();
                      if (screenId === 'douban-screen') renderDoubanScreen();
                     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                     const screenToShow = document.getElementById(screenId);
@@ -12965,6 +13160,12 @@ const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/noti
             break;
                     }
                 }
+    // X社交页面渲染函数
+      function renderXSocialScreen() {
+        // 暂时为空，后续添加X社交页面的渲染逻辑
+        console.log("渲染X社交页面");
+      }
+      window.renderXSocialScreenProxy = renderXSocialScreen;
                 
                 function renderQzoneScreen() {
                     if (state && state.qzoneSettings) {
@@ -14907,22 +15108,21 @@ async function deleteNpc(npcId) {
     }
 }
 // ▲▲▲ 全新JS代码粘贴结束 ▲▲▲        
-        // ▼▼▼ 请用这个【全新版本】的函数，完整替换掉你旧的 renderChatList ▼▼▼
+// ▼▼▼ 【请用这个已升级“分批加载”功能的全新版本】替换旧的 renderChatList 函数 ▼▼▼
+        let chatListRenderCount = 0; // 新增一个全局变量，跟踪已渲染的数量
+        const CHAT_LIST_RENDER_WINDOW = 30; // 每次加载30条
+
         async function renderChatList() {
             const chatListEl = document.getElementById('chat-list');
             chatListEl.innerHTML = '';
         
-            // 1. 获取所有聊天并进行【多级排序】
+            // 1. 获取并排序所有聊天数据（这部分逻辑不变）
             const allChats = Object.values(state.chats).sort((a, b) => {
-                // 规则1：按 isPinned 降序排（true的在前）
                 const pinDiff = (b.isPinned || false) - (a.isPinned || false);
                 if (pinDiff !== 0) return pinDiff;
-        
-                // 规则2：如果置顶状态相同，则按最新消息时间降序排
                 return (b.history.slice(-1)[0]?.timestamp || 0) - (a.history.slice(-1)[0]?.timestamp || 0);
             });
             
-            // 2. 获取所有分组
             const allGroups = await db.qzoneGroups.toArray();
         
             if (allChats.length === 0) {
@@ -14930,54 +15130,159 @@ async function deleteNpc(npcId) {
                 return;
             }
         
-            // 3. 为每个分组找到其内部最新的消息时间戳
             allGroups.forEach(group => {
                 const latestChatInGroup = allChats.find(chat => chat.groupId === group.id);
                 group.latestTimestamp = latestChatInGroup ? (latestChatInGroup.history.slice(-1)[0]?.timestamp || 0) : 0;
             });
-        
-            // 4. 根据这个最新的时间戳来对“分组本身”进行排序
             allGroups.sort((a, b) => b.latestTimestamp - a.latestTimestamp);
-        
-            // 5. 现在，我们按照排好序的分组来渲染
+            
+            // 【核心修改】将排序后的所有聊天项（包括分组和非分组）合并到一个有序数组中
+            const sortedRenderableItems = [];
+            const processedChatIds = new Set();
+
             allGroups.forEach(group => {
                 const groupChats = allChats.filter(chat => !chat.isGroup && chat.groupId === group.id);
-                if (groupChats.length === 0) return;
-        
-                const groupContainer = document.createElement('div');
-                groupContainer.className = 'chat-group-container';
-                groupContainer.innerHTML = `
-                    <div class="chat-group-header">
-                        <span class="arrow">▼</span>
-                        <span class="group-name">${group.name}</span>
-                    </div>
-                    <div class="chat-group-content"></div>
-                `;
-                const contentEl = groupContainer.querySelector('.chat-group-content');
-                groupChats.forEach(chat => {
-                    const item = createChatListItem(chat);
-                    contentEl.appendChild(item);
-                });
-                chatListEl.appendChild(groupContainer);
+                if (groupChats.length > 0) {
+                    sortedRenderableItems.push({ type: 'groupHeader', group });
+                    groupChats.forEach(chat => {
+                        sortedRenderableItems.push({ type: 'chatItem', chat });
+                        processedChatIds.add(chat.id);
+                    });
+                }
             });
-        
-            // 6. 最后，渲染所有群聊和未分组的好友
-            const ungroupedOrGroupChats = allChats.filter(chat => chat.isGroup || (!chat.isGroup && !chat.groupId));
-            ungroupedOrGroupChats.forEach(chat => {
-                const item = createChatListItem(chat);
-                chatListEl.appendChild(item);
+
+            allChats.forEach(chat => {
+                if (!processedChatIds.has(chat.id)) {
+                    sortedRenderableItems.push({ type: 'chatItem', chat });
+                }
             });
-        
-            // 为所有分组标题添加折叠事件
+
+            // 2. 【核心修改】只渲染第一批次的聊天项
+            const initialItems = sortedRenderableItems.slice(0, CHAT_LIST_RENDER_WINDOW);
+            chatListRenderCount = 0;
+
+            const fragment = document.createDocumentFragment();
+            let currentGroupContent = null;
+
+            initialItems.forEach(item => {
+                if (item.type === 'groupHeader') {
+                    const groupContainer = createChatGroupContainer(item.group);
+                    fragment.appendChild(groupContainer);
+                    currentGroupContent = groupContainer.querySelector('.chat-group-content');
+                } else if (item.type === 'chatItem') {
+                    const listItem = createChatListItem(item.chat);
+                    if (currentGroupContent && item.chat.groupId) {
+                        currentGroupContent.appendChild(listItem);
+                    } else {
+                        fragment.appendChild(listItem);
+                        currentGroupContent = null;
+                    }
+                }
+            });
+            chatListEl.appendChild(fragment);
+            chatListRenderCount = initialItems.length;
+
+            // 3. 【核心修改】如果还有更多，则添加“加载更多”按钮
+            if (sortedRenderableItems.length > chatListRenderCount) {
+                appendLoadMoreChatsButton(chatListEl, sortedRenderableItems);
+            }
+            
+            // 为所有新渲染的分组标题添加折叠事件
             document.querySelectorAll('.chat-group-header').forEach(header => {
-                header.addEventListener('click', () => {
-                    header.classList.toggle('collapsed');
-                    header.nextElementSibling.classList.toggle('collapsed');
+                // (为避免重复绑定，先移除旧的)
+                const newHeader = header.cloneNode(true);
+                header.parentNode.replaceChild(newHeader, header);
+                newHeader.addEventListener('click', () => {
+                    newHeader.classList.toggle('collapsed');
+                    newHeader.nextElementSibling.classList.toggle('collapsed');
                 });
             });
         }
         // ▲▲▲ 替换结束 ▲▲▲
-        
+// ▼▼▼ 【全新】这是为“分批加载”新增的所有辅助函数 ▼▼▼
+
+        /**
+         * 创建一个分组的容器（不包含聊天项）
+         */
+        function createChatGroupContainer(group) {
+            const groupContainer = document.createElement('div');
+            groupContainer.className = 'chat-group-container';
+            groupContainer.innerHTML = `
+                <div class="chat-group-header">
+                    <span class="arrow">▼</span>
+                    <span class="group-name">${group.name}</span>
+                </div>
+                <div class="chat-group-content"></div>
+            `;
+            return groupContainer;
+        }
+
+        /**
+         * 创建并添加“加载更多”按钮
+         */
+        function appendLoadMoreChatsButton(container, sortedItems) {
+            const button = document.createElement('button');
+            button.id = 'load-more-chats-btn';
+            button.textContent = '加载更早的会话';
+            button.className = 'load-more-btn'; // 复用样式
+            
+            // 【重要】为按钮绑定加载下一页的事件
+            button.addEventListener('click', () => loadMoreChats(sortedItems), { once: true });
+            
+            container.prepend(button); // 将按钮添加到列表顶部
+        }
+
+        /**
+         * 加载并渲染下一批次的聊天记录
+         */
+        function loadMoreChats(sortedItems) {
+            const chatListEl = document.getElementById('chat-list');
+            const loadMoreBtn = document.getElementById('load-more-chats-btn');
+            if (loadMoreBtn) loadMoreBtn.remove();
+            
+            const nextSliceStart = chatListRenderCount;
+            const nextSliceEnd = chatListRenderCount + CHAT_LIST_RENDER_WINDOW;
+            const itemsToAppend = sortedItems.slice(nextSliceStart, nextSliceEnd);
+
+            // 使用 DocumentFragment 提高性能
+            const fragment = document.createDocumentFragment();
+            let currentGroupContent = chatListEl.querySelector('.chat-group-content:last-of-type');
+
+            itemsToAppend.forEach(item => {
+                if (item.type === 'groupHeader') {
+                    const groupContainer = createChatGroupContainer(item.group);
+                    fragment.appendChild(groupContainer);
+                    currentGroupContent = groupContainer.querySelector('.chat-group-content');
+                } else if (item.type === 'chatItem') {
+                    const listItem = createChatListItem(item.chat);
+                    if (currentGroupContent && item.chat.groupId) {
+                        currentGroupContent.appendChild(listItem);
+                    } else {
+                        fragment.appendChild(listItem);
+                        currentGroupContent = null;
+                    }
+                }
+            });
+            
+            // 将新生成的项一次性添加到列表中
+            chatListEl.appendChild(fragment);
+            chatListRenderCount += itemsToAppend.length;
+
+            if (sortedItems.length > chatListRenderCount) {
+                appendLoadMoreChatsButton(chatListEl, sortedItems);
+            }
+            
+            // 重新为所有分组标题绑定事件
+            document.querySelectorAll('.chat-group-header').forEach(header => {
+                const newHeader = header.cloneNode(true);
+                header.parentNode.replaceChild(newHeader, header);
+                newHeader.addEventListener('click', () => {
+                    newHeader.classList.toggle('collapsed');
+                    newHeader.nextElementSibling.classList.toggle('collapsed');
+                });
+            });
+        }
+        // ▲▲▲ 新增函数结束 ▲▲▲        
         // ▼▼▼ 请用这个【已升级HTML结构并修复点击问题】的全新版本，完整替换您现有的 createChatListItem 函数 ▼▼▼
         function createChatListItem(chat) {
             const lastMsgObj = chat.history.filter(msg => !msg.isHidden).slice(-1)[0] || {};
@@ -15178,7 +15483,22 @@ async function deleteNpc(npcId) {
                 lockOverlay.style.display = 'flex';   // 2. 显示遮罩层作为背景
                 lockContent.innerHTML = `
                     <span class="lock-text">正在围观AI们的群聊...</span>
-                    <button id="spectator-propel-btn" class="lock-action-btn">🎬 推进剧情</button>
+        <div class="spectator-actions-container">
+           <button id="spectator-reroll-btn" class="lock-action-btn secondary" title="重新生成上一轮对话">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                </svg>
+            </button>
+            <button id="spectator-propel-btn" class="lock-action-btn">🎬 推进剧情</button>
+            <button id="spectator-edit-btn" class="lock-action-btn secondary" title="导演剪辑室：编辑AI上一轮的响应">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                    <line x1="16" y1="8" x2="2" y2="22"></line>
+                    <line x1="17.5" y1="15" x2="9" y2="15"></line>
+                </svg>
+            </button>
+        </div>
                 `; // 3. 在遮罩层里显示新的UI
                 
                 // 4. 为新的“推进剧情”按钮绑定专属函数
@@ -15655,9 +15975,14 @@ async function deleteNpc(npcId) {
             stickersToShow.forEach(sticker => {
                 const item = document.createElement('div');
                 item.className = 'sticker-item';
-                item.style.backgroundImage = `url(${sticker.url})`;
                 item.title = sticker.name;
                 item.dataset.stickerId = sticker.id;
+
+                // 创建图片容器和名称标签
+                item.innerHTML = `
+                    <div class="sticker-image-container" style="background-image: url(${sticker.url})"></div>
+                    <span class="sticker-name">${sticker.name}</span>
+                `;
 
                 item.addEventListener('click', () => {
                     if (isStickerManagementMode) {
@@ -15676,9 +16001,11 @@ async function deleteNpc(npcId) {
                     if (confirmed) {
                         await db.userStickers.delete(sticker.id);
                         state.userStickers = state.userStickers.filter(s => s.id !== sticker.id);
-                        renderStickerPanel();
+                        renderStickerPanel(); // Refresh the panel after deletion
                     }
                 };
+                
+                // 将删除按钮添加到总容器的右上角
                 item.appendChild(deleteBtn);
                 grid.appendChild(item);
             });
@@ -16396,7 +16723,8 @@ async function triggerSpectatorGroupAiAction() {
     if (!state.activeChatId) return;
     const chatId = state.activeChatId;
     const chat = state.chats[chatId];
-
+    lastRawAiResponse = '';
+    lastResponseTimestamps = [];
     const propelBtn = document.getElementById('spectator-propel-btn');
     if(propelBtn) {
         propelBtn.disabled = true;
@@ -16535,6 +16863,7 @@ ${membersList}
 
         const data = await response.json();
         const aiResponseContent = getGeminiResponseText(data);
+        lastRawAiResponse = aiResponseContent;
         const messagesArray = parseAiResponse(aiResponseContent);
 
         // ==========================================================
@@ -16548,8 +16877,10 @@ ${membersList}
             if (!msgData || !msgData.type || !msgData.name) continue;
 
             let aiMessage = null;
-            const baseMessage = { role: 'assistant', senderName: msgData.name, timestamp: messageTimestamp++ };
-            
+            const currentMessageTimestamp = messageTimestamp++;
+            lastResponseTimestamps.push(currentMessageTimestamp);
+            const baseMessage = { role: 'assistant', senderName: msgData.name, timestamp: currentMessageTimestamp };
+ 
             // 使用 switch 语句来处理不同的消息类型
             switch (msgData.type) {
                 case 'text':
@@ -19232,7 +19563,7 @@ async function addSongFromLocal(event) {
 }
 // ▲▲▲ 替换结束 ▲▲▲
 
-// ▼▼▼ 【请用这个已修复自动播放问题的全新版本】完整替换旧的 playSong 函数 ▼▼▼
+// ▼▼▼ 【请用这个已修复的版本】完整替换旧的 playSong 函数 ▼▼▼
 async function playSong(index) {
     if (index < 0 || index >= musicState.playlist.length) return;
 
@@ -19260,6 +19591,7 @@ async function playSong(index) {
         }
     }
     
+    // 【核心修复4】优先处理 ArrayBuffer，并根据 fileType 创建 Blob
     if (track.isLocal && track.src instanceof ArrayBuffer) {
         const blob = new Blob([track.src], { type: track.fileType || 'audio/mpeg' });
         audioPlayer.src = URL.createObjectURL(blob);
@@ -19276,19 +19608,7 @@ async function playSong(index) {
     const playPromise = audioPlayer.play();
     if (playPromise !== undefined) {
         playPromise.catch(error => {
-            // --- ★★★★★ 这就是本次修复的核心！ ★★★★★ ---
-            // 捕获浏览器因自动播放策略而抛出的 "NotAllowedError" 错误
-            if (error.name === 'NotAllowedError') {
-                console.warn('Autoplay was prevented by the browser.');
-                // 确保播放器状态为暂停
-                audioPlayer.pause();
-                // 弹窗告知用户，并引导他们手动点击播放
-                showCustomAlert("播放已暂停", "由于浏览器安全限制，AI切换的歌曲无法自动播放。请手动点击播放按钮 ▶ 继续欣赏。");
-            } else if (error.name !== 'AbortError') {
-                // 对于其他非预期的播放错误，在控制台记录下来
-                console.error('Playback error:', error);
-            }
-            // --- ★★★★★ 修复结束 ★★★★★ ---
+            if (error.name !== 'AbortError') console.error('Playback error:', error);
         });
     }
     updatePlaylistUI();
@@ -19304,6 +19624,7 @@ async function playSong(index) {
     }
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
 
 async function deleteTrack(index) { if (index < 0 || index >= musicState.playlist.length) return; const track = musicState.playlist[index]; const wasPlaying = musicState.isPlaying && musicState.currentIndex === index; if (track.isLocal && audioPlayer.src.startsWith('blob:') && musicState.currentIndex === index) URL.revokeObjectURL(audioPlayer.src); musicState.playlist.splice(index, 1); await saveGlobalPlaylist(); if (musicState.playlist.length === 0) { if (musicState.isPlaying) audioPlayer.pause(); audioPlayer.src = ''; musicState.currentIndex = -1; musicState.isPlaying = false; } else { if (wasPlaying) { playNext(); } else { if (musicState.currentIndex >= index) musicState.currentIndex = Math.max(0, musicState.currentIndex - 1); } } updatePlayerUI(); updatePlaylistUI(); }
         
@@ -25167,20 +25488,26 @@ function robustJsonParse(rawContent) {
         
             const systemPrompt = `
 # 你的任务
-你是一个记忆整合专家。请阅读下面的“记忆要点列表”，并将它们整合成一个更加精炼、连贯的核心记忆摘要。
+你就是角色“${targetChatForRefine.originalName}”。现在，请你静下心来，回顾一下你脑海中这些零散的记忆片段。你的任务是将它们整合成一段【第一人称 ("我")】的、流畅连贯的内心独白或回忆录。
 
 # 核心要求
-1.  **保留关键信息**: 请务必保留所有关键的人物、事件、设定和情感关系。
-2.  **消除冗余**: 请移除重复的、或已经不再重要的旧信息。
-3.  **客观视角**: 请使用客观的第三人称进行总结。并使用“${userNickname}”（代表用户）和“${targetChatForRefine.originalName}”（代表AI角色）来指代对话双方。
-4.  **长度要求**: 最终的摘要总长度应控制在 ${wordCount} 个字左右。
-5.  **格式要求**: 请确保你的回复是一个JSON对象，格式为：
-    \`{"summary": "在这里写下你整合并精炼后的核心记忆摘要。"}\`
+1.  **视角铁律**: 你的总结【必须】使用【主观的第一人称视角 ("我")】来写。
+2.  **内容核心**: 你的回忆录应该包含：
+    *   **剧情回顾**: 提炼出关键的事件和情节。
+    *   **心理活动**: 描述“我”在这些事件中的真实感受、想法和情感变化。
+    *   **关系梳理**: 提及“我”与“${userNickname}”（用户）或其他重要人物的关系发展。
+3.  **口吻与人设**: 你的行文风格和语气【必须】严格符合你的角色设定。
+4.  **长度要求**: 最终的回忆录总长度应控制在 **${wordCount} 个字** 左右。
+5.  **格式要求**: 你的回复【必须且只能】是一个JSON对象，格式如下：
+    \`{"summary": "在这里写下你以第一人称视角，整合并精炼后的核心回忆录。"}\`
 
-# 待整合的记忆要点列表
+# 你的角色设定
+${targetChatForRefine.settings.aiPersona}
+
+# 待整理的记忆片段
 ${memoryContent}
 
-请根据以上要求开始你的工作。
+现在，请以“${targetChatForRefine.originalName}”的身份，开始你的回忆与思考。
 `;
         
             await showCustomAlert("请稍候...", "正在请求AI进行记忆精炼...");
@@ -25317,20 +25644,19 @@ async function triggerAutoSummary(chatId, force = false) {
 你是一个高级的“记忆分配专家”。你的任务是阅读下面的群聊记录，并为【每一个参与的AI角色】生成一段【个性化的、第一人称】的长期记忆。
 
 # 核心规则
-1.  **【【【视角铁律】】】**: 每一条总结都【必须】使用【第一人称视角 ("我")】。
-2.  **【【【相关性铁律】】】**: 每个角色的记忆【必须】与他们自身高度相关。重点总结：
-    -   **我说过的话** 和 **我做过的事**。
-    -   别人 **对我** 说的话，或者 **与我相关** 的事。
-    -   对我个人 **很重要** 的群聊事件。
-3.  **【【【简洁性铁律】】】**: 每条个人记忆总结【绝对不能超过60个字】。
-4.  **【【【省略规则】】】**: 如果一个角色在本次对话中【完全没有参与或提及】，你可以省略TA的记忆，或者总结为“我在群里潜水，没怎么说话。”
+1.  **视角铁律**: 每一条总结都【必须】使用【第一人称视角 ("我")】。
+2.  **内容核心**: 重点总结：
+    *   **我说过的话** 和 **我做过的事**。
+    *   别人 **对我** 说的话，或者 **与我相关** 的事。
+    *   对我个人 **很重要** 的群聊事件、关键信息和心理活动。
+3.  **【简洁性铁律】**: 每条个人记忆总结【绝对不能超过60个字】。
+4.  **【省略规则】**: 如果一个角色在本次对话中【完全没有参与或提及】，你可以省略TA的记忆。
 5.  **输出格式**: 你的回复【必须且只能】是一个JSON对象，格式如下：
     \`\`\`json
     {
       "summaries": {
         "角色的本名A": "我今天在群里和大家讨论了电影，感觉很开心。",
-        "角色的本名B": "我在群里和${userNickname}聊了关于生日派对的事，我们约好了下周见面。",
-        "角色的本名C": "我今天在群里潜水，没什么特别的。"
+        "角色的本名B": "我在群里和${userNickname}聊了关于生日派对的事，我们约好了10月1日见面。"
       }
     }
     \`\`\`
@@ -25341,21 +25667,31 @@ ${formattedHistory}
 # 群成员列表 (你的总结目标)
 ${chat.members.map(m => `- ${m.groupNickname} (本名: ${m.originalName})`).join('\n')}
 
-现在，请为【每一个AI角色】生成他们各自的、第一人称的、精简的记忆。`;
+现在，请为【参与了对话的AI角色】生成他们各自的、第一人称的、精简的记忆。`;
 
     } else {
         // --- 这是为【单聊】设计的、保持不变的“客观总结”指令 ---
         systemPrompt = `
 # 你的任务
-你是一个对话摘要专家。你的唯一任务是阅读下面的对话历史，并将其浓缩成【一段】流畅、连贯、客观、并且【极其精简】的摘要。
+你就是角色“${chat.originalName}”。请你回顾一下刚才和“${userNickname}”的对话，然后用【第一人称 ("我")】的口吻，总结出一段简短的、包含核心事件和心理活动的回忆。
+
 # 核心规则
-1.  **【【【长度铁律】】】**: 你的总结【必须】非常简短，总长度【绝对不能超过80个字】。
-2.  **第三人称与命名**: 必须使用第三人称视角。请严格使用“${userNickname}”（代表用户）和“${chat.originalName}”（代表AI角色）来指代对话双方。
-3.  **输出格式**: 你的回复【必须且只能】是一个JSON对象，格式如下：
-    \`{"summary": "在这里写下你总结好的摘要。"}\`
+1.  **视角铁律**: 你的总结【必须】使用【主观的第一人称视角 ("我")】来写。
+2.  **内容核心**: 你的回忆应该包含：
+    *   **剧情回顾**: 刚才我们聊了什么关键的事？
+    *   **心理活动**: 我当时心里是怎么想的？有什么感觉？
+3.  **长度铁律**: 你的总结【必须】非常简短，总长度【绝对不能超过80个字】。
+4.  **口吻与人设**: 你的语气【必须】严格符合你的角色设定。
+5.  **输出格式**: 你的回复【必须且只能】是一个JSON对象，格式如下：
+    \`{"summary": "在这里写下你以第一人称视角，总结好的核心回忆。"}\`
+
+# 你的角色设定
+${chat.settings.aiPersona}
+
 # 待总结的对话历史
 ${formattedHistory}
-现在，请开始你的总结工作。`;
+
+现在，请以“${chat.originalName}”的身份，开始你的回忆。`;
     }
     // ▲▲▲ 修改结束 ▲▲▲
 
@@ -28831,7 +29167,28 @@ ${boardString}
             return wrapper;
         }
         // ▼▼▼ 【全新】重新生成回复功能核心函数 ▼▼▼
-        
+// ▼▼▼ 【全新】这是为“围观模式”新增的“重Roll”功能函数 ▼▼▼
+/**
+ * 处理围观模式下的“重Roll”请求
+ */
+async function handleSpectatorReroll() {
+    const chat = state.chats[state.activeChatId];
+    if (!chat || !lastResponseTimestamps || lastResponseTimestamps.length === 0) {
+        alert("没有可供重新生成的AI响应。");
+        return;
+    }
+
+    // 1. 从聊天历史中移除上一轮AI生成的所有消息
+    chat.history = chat.history.filter(msg => !lastResponseTimestamps.includes(msg.timestamp));
+
+    // 2. 保存更改并刷新UI
+    await db.chats.put(chat);
+    await renderChatInterface(state.activeChatId);
+    
+    // 3. 再次触发AI响应
+    triggerSpectatorGroupAiAction();
+}
+// ▲▲▲ 新增函数结束 ▲▲▲        
         /**
          * 【总入口】处理聊天界面的“重新生成”请求
          */
@@ -39643,7 +40000,18 @@ document.getElementById('npc-avatar-input').addEventListener('change', (event) =
         reader.readAsDataURL(file);
     }
 });
-
+document.getElementById('chat-lock-overlay').addEventListener('click', (e) => {
+    // 检查点击的是否是“重Roll”按钮
+    if (e.target.id === 'spectator-reroll-btn') {
+        handleSpectatorReroll();
+    }
+    // 检查点击的是否是“剪辑”按钮
+    else if (e.target.id === 'spectator-edit-btn') {
+        // 直接复用现有的“导演剪辑室”打开函数
+        openAiResponseEditor();
+    }
+    // (注意：主按钮 spectator-propel-btn 的事件已在 renderChatInterface 中直接绑定，这里无需处理)
+});
 
 
 
