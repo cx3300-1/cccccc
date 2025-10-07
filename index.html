@@ -27,7 +27,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-     <script src="x-social-app.js" defer></script>
+     <script src="https://phoebeboo.github.io/mewoooo/pp.js" defer></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
@@ -9156,6 +9156,225 @@ input, textarea, select {
 }
 
 /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】音乐播放器背景样式 ▼▼▼ */
+
+/* 1. 让播放器窗口成为相对定位的容器，以便伪元素定位 */
+.music-player-window {
+    position: relative;
+    /* (可选) 增加一个轻微的背景蒙版，让文字在亮色背景下更清晰 */
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+/* 2. 这就是我们的背景层核心样式 */
+.music-player-window::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* 3. 使用CSS变量来动态设置背景图片 */
+    background-image: var(--music-bg-image);
+    background-size: cover;
+    background-position: center;
+    
+    /* 4. 添加视觉效果：高斯模糊和降低亮度，营造氛围感 */
+    filter: blur(15px) brightness(0.8);
+    
+    /* 5. 确保背景在最底层，不遮挡内容 */
+    z-index: -1;
+    
+    /* 6. 让背景层的圆角和播放器窗口保持一致 */
+    border-radius: inherit; 
+    
+    /* 7. 为背景切换增加平滑的过渡动画 */
+    transition: background-image 0.5s ease-in-out;
+}
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新V2.0 | 最终修复版】背景清晰度切换功能样式 ▼▼▼ */
+
+/* 1. 当播放器窗口拥有 .bg-clear 这个 class 时，让背景变得清晰 (此规则不变) */
+.music-player-window.bg-clear::before {
+    filter: none;
+}
+
+/* 2. 【核心修改】为“清”字按钮设置新的、与其它控制按钮一致的样式 */
+#toggle-blur-btn {
+    /* 移除所有定位属性 */
+    /* position: absolute; bottom: 95px; right: 20px; z-index: 55; */
+
+    /* 复用其他按钮的样式 */
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #333;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+    
+    /* 给一个和其他按钮相似的淡淡背景 */
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* 3. 按钮激活时的样式（表示当前是清晰模式） */
+#toggle-blur-btn.active {
+    background-color: var(--accent-color); /* 例如，激活时变为主题色 */
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】播放器全屏功能样式 ▼▼▼ */
+
+/* 1. 当播放器窗口拥有 .fullscreen 这个 class 时，让它撑满整个屏幕 */
+.music-player-window.fullscreen {
+    width: 100%;
+    height: 100%;
+    max-height: 100%; /* 覆盖可能存在的 max-height 限制 */
+    border-radius: 0; /* 全屏时移除圆角 */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* 让放大缩小的动画更流畅 */
+}
+
+/* 2. 当播放器全屏时，移除外部容器的内边距，让播放器能真正贴合屏幕边缘 */
+#music-player-overlay.fullscreen-active {
+    padding-top: 0;
+    align-items: stretch; /* 让播放器在垂直方向上也能撑满 */
+}
+
+/* 3. 【核心】为新的全屏切换按钮定义样式 */
+#toggle-fullscreen-btn {
+    background: none;
+    border: none;
+    font-size: 22px; /* 设置一个合适的图标大小 */
+    cursor: pointer;
+    color: #555;
+    padding: 5px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+#toggle-fullscreen-btn:hover {
+    color: #000;
+}
+
+/* 4. 【核心】通过 CSS 控制放大/缩小图标的显示和隐藏 */
+/* 默认情况下，只显示“放大”图标 */
+#toggle-fullscreen-btn .icon-minimize {
+    display: none;
+}
+/* 当播放器处于全屏状态时，隐藏“放大”图标，显示“缩小”图标 */
+.music-player-window.fullscreen #toggle-fullscreen-btn .icon-maximize {
+    display: none;
+}
+.music-player-window.fullscreen #toggle-fullscreen-btn .icon-minimize {
+    display: block;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】播放器全屏头像显示功能样式 ▼▼▼ */
+
+/* 1. 头像显示容器的样式 */
+#music-player-avatar-display {
+    display: none; /* 默认隐藏 */
+    width: 100%;
+    padding: 15px 20px;
+    box-sizing: border-box;
+    justify-content: space-between; /* 让两个头像分布在两端 */
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* 添加一条分割线 */
+    margin-bottom: 10px;
+}
+
+/* 2. 只有当播放器全屏，并且该容器有 .visible 类时，才显示它 */
+.music-player-window.fullscreen #music-player-avatar-display.visible {
+    display: flex;
+}
+
+/* 3. 头像本身的样式 */
+.participant-display-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* 4. 新的“显示头像”按钮的样式 */
+#show-avatars-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: none; /* 默认在非全屏模式下隐藏 */
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+/* 5. 只有在全屏模式下才显示这个按钮 */
+.music-player-window.fullscreen #show-avatars-btn {
+    display: flex;
+}
+
+#show-avatars-btn:hover {
+    opacity: 1;
+}
+
+/* 6. 当头像正在显示时，让按钮也高亮 */
+#show-avatars-btn.active {
+    opacity: 1;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】这是为豆瓣设置弹窗添加的样式 ▼▼▼ */
+.douban-settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.douban-settings-item label {
+    margin-bottom: 0;
+    flex-grow: 1; /* 让标签占据更多空间 */
+}
+.douban-settings-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 在输入框和文字之间增加间距 */
+    flex-shrink: 0; /* 防止被压缩 */
+}
+.douban-settings-controls input {
+    width: 60px;
+    text-align: center;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+/* ▼▼▼ 【全新】这是为时区搜索框添加的样式 ▼▼▼ */
+#time-zone-search-input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px; /* 和下方的下拉框拉开一点距离 */
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px; /* 避免在iOS上输入时自动放大页面 */
+}
+/* 夜间模式适配 */
+#phone-screen.dark-mode #time-zone-search-input {
+    background-color: #1c1c1e;
+    color: #ffffff;
+    border-color: #38383a;
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -10375,20 +10594,48 @@ input, textarea, select {
 <div id="music-player-overlay">
     <!-- ▼▼▼ 【请用这整块代码】替换旧的 .music-player-window ▼▼▼ -->
     <div class="music-player-window">
-        <div class="music-player-top-actions">
-            <div class="top-left-cluster">
-                <button id="music-return-btn">‹</button>
-                <button id="music-exit-btn">×</button>
-            </div>
-            <span id="music-playlist-btn">☰</span>
-        </div>
+        <!-- ▼▼▼ 【请用这整块代码】替换旧的 .music-player-top-actions ▼▼▼ -->
+<div class="music-player-top-actions">
+    <div class="top-left-cluster">
+        <button id="music-return-btn">‹</button>
+        <button id="music-exit-btn">×</button>
+    </div>
+    
+    <!-- 【核心修改】创建一个新的容器来包裹右侧的两个按钮 -->
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <!-- 【全新】这就是我们的全屏切换按钮 -->
+        <button id="toggle-fullscreen-btn" title="切换全屏">
+            <!-- 放大图标 -->
+            <svg class="icon-maximize" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            <!-- 缩小图标 (默认隐藏) -->
+            <svg class="icon-minimize" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+        </button>
 
-        <!-- 核心修改：将歌曲信息移动到唱片上方，并用一个容器包裹 -->
-        <div id="music-info-top">
-            <div id="music-time-counter">已经一起听了0.0小时</div>
-            <div id="music-player-song-title">请添加歌曲</div>
-            <div id="music-player-artist">...</div>
-        </div>
+        <!-- 播放列表按钮保持不变 -->
+        <span id="music-playlist-btn">☰</span>
+    </div>
+</div>
+<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+        <!-- ▼▼▼ 【全新】这是头像显示容器，默认隐藏 ▼▼▼ -->
+<div id="music-player-avatar-display">
+    <!-- 头像将由JS动态生成在这里 -->
+</div>
+<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
+
+<!-- 核心修改：将歌曲信息移动到唱片上方，并用一个容器包裹 -->
+<div id="music-info-top">
+    <!-- 【核心修改】将时间和按钮包裹在一个flex容器中，使其并排显示 -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+        <div id="music-time-counter">已经一起听了0.0小时</div>
+        <!-- 【全新】这是我们的新按钮 -->
+        <button id="show-avatars-btn" title="显示/隐藏头像">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </button>
+    </div>
+    <div id="music-player-song-title">请添加歌曲</div>
+    <div id="music-player-artist">...</div>
+</div>
 
         <!-- 唱片/歌词切换容器保持不变 -->
         <div id="music-visual-container">
@@ -10418,6 +10665,7 @@ input, textarea, select {
                 <button id="music-play-pause-btn" class="play-pause-btn">▶</button>
                 <button id="music-next-btn">▶</button>
                 <button id="music-mode-btn">顺序</button>
+                <button id="toggle-blur-btn" title="切换背景清晰度">清</button>
             </div>
         </div>
     </div>
@@ -10743,6 +10991,12 @@ input, textarea, select {
         <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
         <span>豆瓣小组</span>
         <div class="header-actions">
+        <!-- 【核心新增】这就是我们的新设置按钮 -->
+        <span class="action-btn" id="douban-settings-btn" title="豆瓣设置">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.44,0.17-0.48,0.41L9.12,4.84c-0.59,0.24-1.12,0.56-1.62,0.94L5.11,4.82c-0.22-0.08-0.47,0-0.59,0.22l-1.92,3.32 c-0.12,0.22-0.07,0.47,0.12,0.61l2.03,1.58C4.84,11.36,4.82,11.68,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.48,2.03 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.48-0.41l0.48-2.03c0.59-0.24,1.12-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path>
+            </svg>
+        </span>
             <span class="action-btn" id="douban-cast-select-btn" title="选择参与角色">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -11001,6 +11255,12 @@ input, textarea, select {
             </div>
         </div>
         <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
+<div class="form-group" id="time-zone-group" style="display: none;">
+    <label for="time-zone-select">选择时区</label>
+    <!-- 【核心新增】这就是我们的搜索框 -->
+    <input type="search" id="time-zone-search-input" placeholder="搜索时区，例如 Shanghai, New York...">
+    <select id="time-zone-select" style="width: 100%;"></select>
+</div>
 <div class="form-group" id="group-background-activity-group">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <label for="group-background-activity-switch" style="margin-bottom: 0;">
@@ -12308,6 +12568,7 @@ let activeDiaryForViewing = null; // 用于暂存当前正在查看的日记对�
                 const defaultGroupMemberAvatar = 'https://i.postimg.cc/VkQfgzGJ/1.jpg';
                 const defaultGroupAvatar = 'https://i.postimg.cc/gc3QYCDy/1-NINE7-Five.jpg';
                 let notificationTimeout;
+                let ruleCache = {}; // 用于缓存渲染规则
 // 在你的JS顶部变量定义区，添加这个新常量
 const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/notification-sound-2.mp3'; // 默认的微信提示音
         // ▼▼▼ 在JS顶部，变量定义区，添加这个新变量 ▼▼▼
@@ -12348,7 +12609,7 @@ const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/noti
         // ▲▲▲ 新增代码结束 ▲▲▲
         let repostTargetId = null; // 用于存储当前要转发的动态ID
                 const STICKER_REGEX = /(^https:\/\/i\.postimg\.cc\/.+|^https:\/\/files\.catbox\.moe\/.+|^https?:\/\/sharkpan\.xyz\/.+|^data:image|\.(png|jpg|jpeg|gif|webp)\?.*$|\.(png|jpg|jpeg|gif|webp)$)/i;
-                const MESSAGE_RENDER_WINDOW = 50;
+                const MESSAGE_RENDER_WINDOW = 25;
                 let currentRenderedCount = 0;
                 let lastKnownBatteryLevel = 1;
                 let alertFlags = { hasShown40: false, hasShown20: false, hasShown10: false };
@@ -12827,22 +13088,28 @@ const DEFAULT_NOTIFICATION_SOUND = 'https://www.myinstants.com/media/sounds/noti
         }
         // ▲▲▲ 替换结束 ▲▲▲
         
-                function showCustomAlert(title, message) {
-                    return new Promise(resolve => {
-                        modalResolve = resolve;
-                        modalTitle.textContent = title;
-                        modalBody.innerHTML = `<p style="text-align: left; white-space: pre-wrap;">${message}</p>`;
-                        modalCancelBtn.style.display = 'none';
-                        modalConfirmBtn.textContent = '好的';
-                        modalConfirmBtn.onclick = () => {
-                            modalCancelBtn.style.display = 'block'; 
-                            modalConfirmBtn.textContent = '确定';
-                            resolve(true); 
-                            hideCustomModal();
-                        };
-                        showCustomModal();
-                    });
-                }
+function showCustomAlert(title, message) {
+    return new Promise(resolve => {
+        modalResolve = resolve;
+        modalTitle.textContent = title;
+        modalBody.innerHTML =`<p style="text-align: left; white-space: pre-wrap;">${message}</p>`;
+
+        // 核心修正：在函数被调用时，重新获取最新的按钮元素
+        const confirmBtn = document.getElementById('custom-modal-confirm');
+        const cancelBtn = document.getElementById('custom-modal-cancel');
+
+        cancelBtn.style.display = 'none';
+        confirmBtn.textContent = '好的';
+
+        confirmBtn.onclick = () => {
+            cancelBtn.style.display = 'block'; 
+            confirmBtn.textContent = '确定';
+            resolve(true); 
+            hideCustomModal();
+        };
+        showCustomModal();
+    });
+}
         
         // ▼▼▼ 请用这个【修正后】的完整函数，替换掉您现有的 showCustomPrompt 函数 ▼▼▼
         
@@ -15111,94 +15378,178 @@ async function deleteNpc(npcId) {
 // ▼▼▼ 【请用这个已升级“分批加载”功能的全新版本】替换旧的 renderChatList 函数 ▼▼▼
         let chatListRenderCount = 0; // 新增一个全局变量，跟踪已渲染的数量
         const CHAT_LIST_RENDER_WINDOW = 30; // 每次加载30条
+// ▼▼▼ 【全新】这是为“按需加载”新增的所有辅助函数 ▼▼▼
 
-        async function renderChatList() {
-            const chatListEl = document.getElementById('chat-list');
-            chatListEl.innerHTML = '';
-        
-            // 1. 获取并排序所有聊天数据（这部分逻辑不变）
-            const allChats = Object.values(state.chats).sort((a, b) => {
-                const pinDiff = (b.isPinned || false) - (a.isPinned || false);
-                if (pinDiff !== 0) return pinDiff;
-                return (b.history.slice(-1)[0]?.timestamp || 0) - (a.history.slice(-1)[0]?.timestamp || 0);
-            });
-            
-            const allGroups = await db.qzoneGroups.toArray();
-        
-            if (allChats.length === 0) {
-                chatListEl.innerHTML = '<p style="text-align:center; color: #8a8a8a; margin-top: 50px;">点击右上角 "+" 或群组图标添加聊天</p>';
-                return;
+/**
+ * 创建一个分组的容器（不包含聊天项）
+ */
+function createChatGroupContainer(group) {
+    const groupContainer = document.createElement('div');
+    groupContainer.className = 'chat-group-container';
+    groupContainer.innerHTML = `
+        <div class="chat-group-header">
+            <span class="arrow">▼</span>
+            <span class="group-name">${group.name}</span>
+        </div>
+        <div class="chat-group-content"></div>
+    `;
+    return groupContainer;
+}
+
+/**
+ * 创建并添加“加载更多”按钮
+ */
+function appendLoadMoreChatsButton(container, sortedItems) {
+    const button = document.createElement('button');
+    button.id = 'load-more-chats-btn';
+    button.textContent = '加载更早的会话';
+    button.className = 'load-more-btn'; // 复用样式
+    
+    // 【重要】为按钮绑定加载下一页的事件
+    button.addEventListener('click', () => loadMoreChats(sortedItems), { once: true });
+    
+    container.appendChild(button); // 将按钮添加到列表底部
+}
+
+/**
+ * 加载并渲染下一批次的聊天记录
+ */
+function loadMoreChats(sortedItems) {
+    const chatListEl = document.getElementById('chat-list');
+    const loadMoreBtn = document.getElementById('load-more-chats-btn');
+    if (loadMoreBtn) loadMoreBtn.remove();
+    
+    const nextSliceStart = chatListRenderCount;
+    const nextSliceEnd = chatListRenderCount + CHAT_LIST_RENDER_WINDOW;
+    const itemsToAppend = sortedItems.slice(nextSliceStart, nextSliceEnd);
+
+    // 使用 DocumentFragment 提高性能
+    const fragment = document.createDocumentFragment();
+    let currentGroupContent = chatListEl.querySelector('.chat-group-content:last-of-type');
+
+    itemsToAppend.forEach(item => {
+        if (item.type === 'groupHeader') {
+            const groupContainer = createChatGroupContainer(item.group);
+            fragment.appendChild(groupContainer);
+            currentGroupContent = groupContainer.querySelector('.chat-group-content');
+        } else if (item.type === 'chatItem') {
+            const listItem = createChatListItem(item.chat);
+            if (currentGroupContent && item.chat.groupId) {
+                currentGroupContent.appendChild(listItem);
+            } else {
+                fragment.appendChild(listItem);
+                currentGroupContent = null;
             }
-        
-            allGroups.forEach(group => {
-                const latestChatInGroup = allChats.find(chat => chat.groupId === group.id);
-                group.latestTimestamp = latestChatInGroup ? (latestChatInGroup.history.slice(-1)[0]?.timestamp || 0) : 0;
-            });
-            allGroups.sort((a, b) => b.latestTimestamp - a.latestTimestamp);
-            
-            // 【核心修改】将排序后的所有聊天项（包括分组和非分组）合并到一个有序数组中
-            const sortedRenderableItems = [];
-            const processedChatIds = new Set();
+        }
+    });
+    
+    // 将新生成的项一次性添加到列表中
+    chatListEl.appendChild(fragment);
+    chatListRenderCount += itemsToAppend.length;
 
-            allGroups.forEach(group => {
-                const groupChats = allChats.filter(chat => !chat.isGroup && chat.groupId === group.id);
-                if (groupChats.length > 0) {
-                    sortedRenderableItems.push({ type: 'groupHeader', group });
-                    groupChats.forEach(chat => {
-                        sortedRenderableItems.push({ type: 'chatItem', chat });
-                        processedChatIds.add(chat.id);
-                    });
-                }
-            });
+    if (sortedItems.length > chatListRenderCount) {
+        appendLoadMoreChatsButton(chatListEl, sortedItems);
+    }
+    
+    // 重新为所有分组标题绑定事件
+    document.querySelectorAll('.chat-group-header').forEach(header => {
+        const newHeader = header.cloneNode(true);
+        header.parentNode.replaceChild(newHeader, header);
+        newHeader.addEventListener('click', () => {
+            newHeader.classList.toggle('collapsed');
+            newHeader.nextElementSibling.classList.toggle('collapsed');
+        });
+    });
+}
+// ▲▲▲ 新增函数结束 ▲▲▲
+// ▼▼▼ 【全新 | 已升级“分批加载”功能】请用这个全新版本替换旧的 renderChatList 函数 ▼▼▼
+async function renderChatList() {
+    const chatListEl = document.getElementById('chat-list');
+    chatListEl.innerHTML = '';
 
-            allChats.forEach(chat => {
-                if (!processedChatIds.has(chat.id)) {
-                    sortedRenderableItems.push({ type: 'chatItem', chat });
-                }
-            });
+    // 1. 获取并排序所有聊天数据（这部分逻辑不变）
+    const allChats = Object.values(state.chats).sort((a, b) => {
+        const pinDiff = (b.isPinned || false) - (a.isPinned || false);
+        if (pinDiff !== 0) return pinDiff;
+        return (b.history.slice(-1)[0]?.timestamp || 0) - (a.history.slice(-1)[0]?.timestamp || 0);
+    });
+    
+    const allGroups = await db.qzoneGroups.toArray();
 
-            // 2. 【核心修改】只渲染第一批次的聊天项
-            const initialItems = sortedRenderableItems.slice(0, CHAT_LIST_RENDER_WINDOW);
-            chatListRenderCount = 0;
+    if (allChats.length === 0) {
+        chatListEl.innerHTML = '<p style="text-align:center; color: #8a8a8a; margin-top: 50px;">点击右上角 "+" 或群组图标添加聊天</p>';
+        return;
+    }
 
-            const fragment = document.createDocumentFragment();
-            let currentGroupContent = null;
+    allGroups.forEach(group => {
+        const latestChatInGroup = allChats.find(chat => chat.groupId === group.id);
+        group.latestTimestamp = latestChatInGroup ? (latestChatInGroup.history.slice(-1)[0]?.timestamp || 0) : 0;
+    });
+    allGroups.sort((a, b) => b.latestTimestamp - a.latestTimestamp);
+    
+    // 【核心修改】将排序后的所有聊天项（包括分组和非分组）合并到一个有序数组中
+    const sortedRenderableItems = [];
+    const processedChatIds = new Set();
 
-            initialItems.forEach(item => {
-                if (item.type === 'groupHeader') {
-                    const groupContainer = createChatGroupContainer(item.group);
-                    fragment.appendChild(groupContainer);
-                    currentGroupContent = groupContainer.querySelector('.chat-group-content');
-                } else if (item.type === 'chatItem') {
-                    const listItem = createChatListItem(item.chat);
-                    if (currentGroupContent && item.chat.groupId) {
-                        currentGroupContent.appendChild(listItem);
-                    } else {
-                        fragment.appendChild(listItem);
-                        currentGroupContent = null;
-                    }
-                }
-            });
-            chatListEl.appendChild(fragment);
-            chatListRenderCount = initialItems.length;
-
-            // 3. 【核心修改】如果还有更多，则添加“加载更多”按钮
-            if (sortedRenderableItems.length > chatListRenderCount) {
-                appendLoadMoreChatsButton(chatListEl, sortedRenderableItems);
-            }
-            
-            // 为所有新渲染的分组标题添加折叠事件
-            document.querySelectorAll('.chat-group-header').forEach(header => {
-                // (为避免重复绑定，先移除旧的)
-                const newHeader = header.cloneNode(true);
-                header.parentNode.replaceChild(newHeader, header);
-                newHeader.addEventListener('click', () => {
-                    newHeader.classList.toggle('collapsed');
-                    newHeader.nextElementSibling.classList.toggle('collapsed');
-                });
+    allGroups.forEach(group => {
+        const groupChats = allChats.filter(chat => !chat.isGroup && chat.groupId === group.id);
+        if (groupChats.length > 0) {
+            sortedRenderableItems.push({ type: 'groupHeader', group });
+            groupChats.forEach(chat => {
+                sortedRenderableItems.push({ type: 'chatItem', chat });
+                processedChatIds.add(chat.id);
             });
         }
-        // ▲▲▲ 替换结束 ▲▲▲
+    });
+
+    allChats.forEach(chat => {
+        if (!processedChatIds.has(chat.id)) {
+            sortedRenderableItems.push({ type: 'chatItem', chat });
+        }
+    });
+
+    // 2. 【核心修改】只渲染第一批次的聊天项
+    const initialItems = sortedRenderableItems.slice(0, CHAT_LIST_RENDER_WINDOW);
+    chatListRenderCount = 0;
+
+    const fragment = document.createDocumentFragment();
+    let currentGroupContent = null;
+
+    initialItems.forEach(item => {
+        if (item.type === 'groupHeader') {
+            const groupContainer = createChatGroupContainer(item.group);
+            fragment.appendChild(groupContainer);
+            currentGroupContent = groupContainer.querySelector('.chat-group-content');
+        } else if (item.type === 'chatItem') {
+            const listItem = createChatListItem(item.chat);
+            if (currentGroupContent && item.chat.groupId) {
+                currentGroupContent.appendChild(listItem);
+            } else {
+                fragment.appendChild(listItem);
+                currentGroupContent = null;
+            }
+        }
+    });
+    chatListEl.appendChild(fragment);
+    chatListRenderCount = initialItems.length;
+
+    // 3. 【核心修改】如果还有更多，则添加“加载更多”按钮
+    if (sortedRenderableItems.length > chatListRenderCount) {
+        appendLoadMoreChatsButton(chatListEl, sortedRenderableItems);
+    }
+    
+    // 为所有新渲染的分组标题添加折叠事件
+    document.querySelectorAll('.chat-group-header').forEach(header => {
+        // (为避免重复绑定，先移除旧的)
+        const newHeader = header.cloneNode(true);
+        header.parentNode.replaceChild(newHeader, header);
+        newHeader.addEventListener('click', () => {
+            newHeader.classList.toggle('collapsed');
+            newHeader.nextElementSibling.classList.toggle('collapsed');
+        });
+    });
+}
+// ▲▲▲ 替换结束 ▲▲▲
 // ▼▼▼ 【全新】这是为“分批加载”新增的所有辅助函数 ▼▼▼
 
         /**
@@ -17194,13 +17545,43 @@ ${membersList}
                 // =========================================================================
                 //                  ★★★ 核心修复代码到此结束 ★★★
                 // =========================================================================
-        
-                const now = new Date();
-                const chinaTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 8));
-                const currentTime = chinaTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', dateStyle: 'full', timeStyle: 'short' });
-                const timeOfDayGreeting = getTimeOfDayGreeting(chinaTime);
+         // ▼▼▼ 核心修改1：在这里定义一个新变量，用于存储通话记录上下文 ▼▼▼
+        let callTranscriptContext = '';       
+const now = new Date();
+// 从当前聊天设置中获取时区，如果未设置，则默认使用上海时间
+const selectedTimeZone = chat.settings.timeZone || 'Asia/Shanghai'; 
+// 使用获取到的时区来格式化当前时间
+const currentTime = now.toLocaleString('zh-CN', { timeZone: selectedTimeZone, dateStyle: 'full', timeStyle: 'short' });
+// 使用 toLocaleString 的强大功能，直接生成对应时区的 Date 对象，用于判断“早上/下午”
+const localizedDate = new Date(now.toLocaleString('en-US', { timeZone: selectedTimeZone }));
+const timeOfDayGreeting = getTimeOfDayGreeting(localizedDate);
                 let systemPrompt, messagesPayload;
-        
+         const lastHiddenMessage = chat.history.filter(m => m.isHidden).pop();
+        if (lastHiddenMessage && lastHiddenMessage.content.includes('视频通话刚刚结束')) {
+            const lastCallRecord = await db.callRecords
+                .where('chatId')
+                .equals(chatId)
+                .last();
+
+            if (lastCallRecord && lastCallRecord.transcript) {
+                console.log("检测到刚结束的通话，正在注入通话记录上下文...");
+                const transcriptText = lastCallRecord.transcript.map(h => {
+                    const sender = h.role === 'user' ? (chat.settings.myNickname || '我') : h.senderName;
+                    return `${sender}: ${h.content}`;
+                }).join('\n');
+
+                // 构建要注入的上下文文本
+                callTranscriptContext = `
+# 刚刚结束的通话记录 (最高优先级参考)
+你和用户刚刚结束了一场视频通话，以下是完整的通话文字记录。你接下来的回复【必须】与这次通话的内容紧密相关。
+---
+${transcriptText}
+---
+`;
+            }
+        }
+        // ▲▲▲ 核心修改2结束 ▲▲▲
+       
                 const gomokuContext = formatGomokuStateForAI(gomokuState[chatId]);
         
                 let worldBookContent = '';
@@ -17532,7 +17913,7 @@ ${sharedContext}
 ${groupAvatarLibraryContext}
 ${shoppingContext}
 ${forbiddenNamesContext}
-
+${callTranscriptContext}
 # 可用指令列表 (按需组合使用)
 ### 核心聊天
 -   **发文本**: \`{"type": "text", "name": "角色本名", "message": "内容"}\`
@@ -18013,7 +18394,7 @@ systemPrompt = `
 - 数组中的【每一个元素都必须是一个带有 "type" 字段的JSON对象】。
 
 # 角色扮演核心规则
-1.  **对话节奏**: 模拟真人的聊天习惯，将你想说的话拆分成【多条、简短的】消息。每次回复至少【5-12条】，且每次条数【必须不同】。严禁发展线下剧情。
+1.  **对话节奏**: 模拟真人的聊天习惯，将你想说的话拆分成【多条、简短的】消息。每次回复至少【3-10条】，且每次条数【必须不同】。严禁发展线下剧情。
 2.  **情景感知**:
     ${chat.settings.enableTimePerception ? `- **时间**: 你必须感知到当前是 ${currentTime} (${timeOfDayGreeting})，并在对话中自然地体现出来。` : ''}
     - **音乐**: ${musicContext ? '你们正在一起听歌，' + musicContext : '你们没有在听歌。'}
@@ -18127,6 +18508,7 @@ ${linkedMemoryContext}
 ${musicContext}
 ${sharedContext}
 ${shoppingContext}
+${callTranscriptContext} 
 
 现在，请根据以上规则和下面的对话历史，继续进行对话。`;
             
@@ -18321,7 +18703,7 @@ if (chat.settings.isOfflineMode) {
     consolidatedMessages = messagesArray;
 }
 // ▲▲▲ 修复结束 ▲▲▲
-// ▼▼▼ 【全新】智能识图优化功能，请将此代码块粘贴到指定位置 ▼▼▼
+/* // ▼▼▼ 【全新】智能识图优化功能，请将此代码块粘贴到指定位置 ▼▼▼
 
 // 1. 检查触发条件：最后一条用户消息是【尚未处理过】的图片
 const lastUserMessage = chat.history.filter(m => m.role === 'user' && !m.isHidden).pop();
@@ -18357,7 +18739,7 @@ if (lastUserMessage &&
         // 注意：此时我们只修改了内存中的 chat.history。
         // 后续的代码会把这个修改后的 history 和新消息一起存入数据库，完成持久化。
     }
-}
+}*/
 // ▲▲▲ 优化功能代码块结束 ▲▲▲
                 const isViewingThisChat = document.getElementById('chat-interface-screen').classList.contains('active') && state.activeChatId === chatId;
                 let callHasBeenHandled = false;
@@ -19481,16 +19863,23 @@ function updatePlaylistUI() {
         const item = document.createElement('div');
         item.className = 'playlist-item';
         if(index === musicState.currentIndex) item.classList.add('playing');
-        item.innerHTML = `
-            <div class="playlist-item-info">
-                <div class="title">${track.name}</div>
-                <div class="artist">${track.artist}</div>
-            </div>
-            <div class="playlist-item-actions">
-                <span class="playlist-action-btn lyrics-btn" data-index="${index}">词</span>
-                <span class="playlist-action-btn delete-track-btn" data-index="${index}">×</span>
-            </div>
-        `;
+
+        // ▼▼▼ 核心修改就在这里 ▼▼▼
+item.innerHTML = `
+    <div class="playlist-item-info">
+        <div class="title">${track.name}</div>
+        <div class="artist">${track.artist}</div>
+    </div>
+    <div class="playlist-item-actions">
+        <span class="playlist-action-btn album-art-btn" data-index="${index}">专辑</span>
+        <span class="playlist-action-btn lyrics-btn" data-index="${index}">词</span>
+        <!-- 【核心新增】在这里添加“背景”按钮 -->
+        <span class="playlist-action-btn bg-btn" data-index="${index}">背景</span>
+        <span class="playlist-action-btn delete-track-btn" data-index="${index}">×</span>
+    </div>
+`;
+        // ▲▲▲ 修改结束 ▲▲▲
+
         item.querySelector('.playlist-item-info').addEventListener('click', () => playSong(index));
         playlistBody.appendChild(item);
     });
@@ -19519,7 +19908,7 @@ function playPrev() { if (musicState.playlist.length === 0) return; const newInd
 function changePlayMode() { const modes = ['order', 'random', 'single']; const currentModeIndex = modes.indexOf(musicState.playMode); musicState.playMode = modes[(currentModeIndex + 1) % modes.length]; document.getElementById('music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[musicState.playMode]; }
 
 async function addSongFromURL() { const url = await showCustomPrompt("添加网络歌曲", "请输入歌曲的URL", "", "url"); if (!url) return; const name = await showCustomPrompt("歌曲信息", "请输入歌名"); if (!name) return; const artist = await showCustomPrompt("歌曲信息", "请输入歌手名"); if (!artist) return; musicState.playlist.push({ name, artist, src: url, isLocal: false }); await saveGlobalPlaylist(); updatePlaylistUI(); if(musicState.currentIndex === -1) { musicState.currentIndex = musicState.playlist.length - 1; updatePlayerUI(); } }
-
+ 
 // ▼▼▼ 【请用这个已修复的版本】完整替换旧的 addSongFromLocal 函数 ▼▼▼
 async function addSongFromLocal(event) {
     const files = event.target.files;
@@ -19564,6 +19953,7 @@ async function addSongFromLocal(event) {
 // ▲▲▲ 替换结束 ▲▲▲
 
 // ▼▼▼ 【请用这个已修复的版本】完整替换旧的 playSong 函数 ▼▼▼
+// ▼▼▼ 【请用这个已支持头像显示并修复渲染问题的全新版本】替换旧的 playSong 函数 ▼▼▼
 async function playSong(index) {
     if (index < 0 || index >= musicState.playlist.length) return;
 
@@ -19571,7 +19961,48 @@ async function playSong(index) {
 
     musicState.currentIndex = index;
     const track = musicState.playlist[index];
+    const chat = state.chats[musicState.activeChatId]; // 获取当前聊天对象
 
+    // --- ▼▼▼ 核心修复：加载并填充头像 (使用更可靠的DOM操作) ▼▼▼ ---
+    const avatarDisplay = document.getElementById('music-player-avatar-display');
+    if (chat && avatarDisplay) {
+        // 1. 清空旧内容
+        avatarDisplay.innerHTML = '';
+
+        // 2. 根据聊天类型获取正确的头像URL
+        const charAvatarUrl = chat.isGroup 
+            ? (chat.members.find(m => m.originalName === track.artist)?.avatar || defaultAvatar) 
+            : (chat.settings.aiAvatar || defaultAvatar);
+        const userAvatarUrl = chat.settings.myAvatar || defaultAvatar;
+
+        // 3. 创建角色头像元素并添加
+        const charAvatarEl = document.createElement('img');
+        charAvatarEl.src = charAvatarUrl;
+        charAvatarEl.className = 'participant-display-avatar';
+        charAvatarEl.alt = 'Character Avatar';
+        avatarDisplay.appendChild(charAvatarEl);
+
+        // 4. 创建用户头像元素并添加
+        const userAvatarEl = document.createElement('img');
+        userAvatarEl.src = userAvatarUrl;
+        userAvatarEl.className = 'participant-display-avatar';
+        userAvatarEl.alt = 'User Avatar';
+        avatarDisplay.appendChild(userAvatarEl);
+    }
+    // --- ▲▲▲ 修复结束 ▲▲▲ ---
+
+    const playerWindow = document.querySelector('.music-player-window');
+    const toggleBtn = document.getElementById('toggle-blur-btn');
+
+    if (playerWindow) {
+        playerWindow.style.setProperty('--music-bg-image', track.background ? `url(${track.background})` : 'none');
+        playerWindow.classList.toggle('bg-clear', !!track.isBgClear);
+    }
+    if (toggleBtn) {
+        toggleBtn.classList.toggle('active', !!track.isBgClear);
+    }
+    
+    // (后续的所有播放逻辑保持不变)
     document.getElementById('music-visual-container').classList.remove('lyrics-active');
     const coverEl = document.getElementById('music-player-cover');
     if (coverEl) {
@@ -19591,7 +20022,6 @@ async function playSong(index) {
         }
     }
     
-    // 【核心修复4】优先处理 ArrayBuffer，并根据 fileType 创建 Blob
     if (track.isLocal && track.src instanceof ArrayBuffer) {
         const blob = new Blob([track.src], { type: track.fileType || 'audio/mpeg' });
         audioPlayer.src = URL.createObjectURL(blob);
@@ -19608,7 +20038,13 @@ async function playSong(index) {
     const playPromise = audioPlayer.play();
     if (playPromise !== undefined) {
         playPromise.catch(error => {
-            if (error.name !== 'AbortError') console.error('Playback error:', error);
+            if (error.name === 'NotAllowedError') {
+                console.warn('Autoplay was prevented by the browser.');
+                audioPlayer.pause();
+                showCustomAlert("播放已暂停", "由于浏览器安全限制，AI切换的歌曲无法自动播放。请手动点击播放按钮 ▶ 继续欣赏。");
+            } else if (error.name !== 'AbortError') {
+                console.error('Playback error:', error);
+            }
         });
     }
     updatePlaylistUI();
@@ -19624,7 +20060,77 @@ async function playSong(index) {
     }
 }
 // ▲▲▲ 替换结束 ▲▲▲
+/**
+ * 处理更换指定歌曲背景图片的逻辑
+ * @param {number} trackIndex - 播放列表中歌曲的索引
+ */
+async function handleChangeBackground(trackIndex) {
+    if (trackIndex < 0 || trackIndex >= musicState.playlist.length) return;
 
+    // 1. 弹出选项，让用户选择上传方式
+    const choice = await showChoiceModal("更换歌曲背景", [
+        { text: '📁 从本地上传', value: 'local' },
+        { text: '🌐 使用网络URL', value: 'url' }
+    ]);
+
+    let newBackgroundUrl = null;
+
+    // 2. 根据选择获取图片
+    if (choice === 'local') {
+        newBackgroundUrl = await uploadImageLocally();
+    } else if (choice === 'url') {
+        newBackgroundUrl = await showCustomPrompt("输入图片URL", "请输入新的背景图片链接", "", "url");
+    }
+
+    // 3. 如果成功获取到图片，则更新并保存
+    if (newBackgroundUrl && newBackgroundUrl.trim()) {
+        musicState.playlist[trackIndex].background = newBackgroundUrl.trim();
+        await saveGlobalPlaylist();
+        
+        // 4. 如果正在播放的就是这首歌，则立即应用新背景
+        if (musicState.currentIndex === trackIndex) {
+            const playerWindow = document.querySelector('.music-player-window');
+            playerWindow.style.setProperty('--music-bg-image', `url(${newBackgroundUrl.trim()})`);
+        }
+
+        await showCustomAlert("成功", "歌曲背景已更新！");
+    }
+}
+/**
+ * 【全新】处理更换专辑封面的逻辑
+ * @param {number} trackIndex - 播放列表中歌曲的索引
+ */
+async function handleChangeAlbumArt(trackIndex) {
+    if (trackIndex < 0 || trackIndex >= musicState.playlist.length) return;
+
+    const choice = await showChoiceModal("更换专辑封面", [
+        { text: '📁 从本地上传', value: 'local' },
+        { text: '🌐 使用网络URL', value: 'url' }
+    ]);
+
+    let newCoverUrl = null;
+
+    if (choice === 'local') {
+        newCoverUrl = await uploadImageLocally();
+    } else if (choice === 'url') {
+        newCoverUrl = await showCustomPrompt("输入图片URL", "请输入新的封面图片链接", "", "url");
+    }
+
+    if (newCoverUrl && newCoverUrl.trim()) {
+        musicState.playlist[trackIndex].cover = newCoverUrl.trim();
+        await saveGlobalPlaylist();
+        
+        // 如果正在播放的歌曲就是被修改的这首，立即更新播放器UI
+        if (musicState.currentIndex === trackIndex) {
+            document.getElementById('music-player-cover').src = newCoverUrl.trim();
+            // 同时更新黑胶唱片中心的图片
+            const vinylCover = document.querySelector('#vinyl-view #music-player-cover');
+            if(vinylCover) vinylCover.src = newCoverUrl.trim();
+        }
+
+        await showCustomAlert("成功", "专辑封面已更新！");
+    }
+}
 
 async function deleteTrack(index) { if (index < 0 || index >= musicState.playlist.length) return; const track = musicState.playlist[index]; const wasPlaying = musicState.isPlaying && musicState.currentIndex === index; if (track.isLocal && audioPlayer.src.startsWith('blob:') && musicState.currentIndex === index) URL.revokeObjectURL(audioPlayer.src); musicState.playlist.splice(index, 1); await saveGlobalPlaylist(); if (musicState.playlist.length === 0) { if (musicState.isPlaying) audioPlayer.pause(); audioPlayer.src = ''; musicState.currentIndex = -1; musicState.isPlaying = false; } else { if (wasPlaying) { playNext(); } else { if (musicState.currentIndex >= index) musicState.currentIndex = Math.max(0, musicState.currentIndex - 1); } } updatePlayerUI(); updatePlaylistUI(); }
         
@@ -20218,9 +20724,19 @@ ${tasksString}
         
             const userNickname = state.qzoneSettings.nickname;
             const now = new Date();
-            let timeContextText = ''; // 【核心修改】提供一个默认空值
-            let recentContextSummary; 
-            let longTimeNoSee = false;
+    // ▼▼▼ 核心修复：在这里也使用您选择的时区 ▼▼▼
+    const selectedTimeZone = chat.settings.timeZone || 'Asia/Shanghai';
+    const currentTime = now.toLocaleString('zh-CN', { timeZone: selectedTimeZone, dateStyle: 'full', timeStyle: 'short' });
+    const localizedDate = new Date(now.toLocaleString('en-US', { timeZone: selectedTimeZone }));
+    // ▲▲▲ 修复结束 ▲▲▲
+// ▼▼▼ 核心修复就在这里！▼▼▼
+// 1. 在 if 代码块外部提前声明变量，并给定一个默认值
+let timeOfDayGreeting = ''; 
+let timeContextText = '';
+let recentContextSummary; 
+let longTimeNoSee = false;
+
+
     // ==========================================================
     //            ★★★ 核心修复从这里开始 ★★★
     // ==========================================================
@@ -20232,6 +20748,7 @@ ${tasksString}
             const lastMessage = chat.history.filter(m => !m.isHidden).slice(-1)[0];
             
 if (chat.settings.enableTimePerception) {
+    timeOfDayGreeting = getTimeOfDayGreeting(localizedDate); // 现在这里只是赋值，而不是声明
     const lastMessage = chat.history.filter(m => !m.isHidden).slice(-1)[0];
     const now = new Date();
     let timeContextText = '';
@@ -20270,7 +20787,8 @@ if (chat.settings.enableTimePerception) {
     }
 
     if (longTimeNoSee) {
-         recentContextSummary = `[情景提示] ${timeContextText} 当前时间是 ${now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' })}. 你可以参考这个时间，并根据你的角色设定，【考虑】是否开启一个新话题来问候用户。\n${historySummary}`;
+         // ▼▼▼ 核心修复：在这里使用新的 currentTime 变量 ▼▼▼
+         recentContextSummary = `[情景提示] ${timeContextText} 当前时间是 ${currentTime}. 你可以参考这个时间，并根据你的角色设定，【考虑】是否开启一个新话题来问候用户。\n${historySummary}`;
     } else {
         recentContextSummary = `${historySummary}`;
     }
@@ -20472,7 +20990,7 @@ ${longTermMemoryContext}
         **你与用户的关系是最重要的！** 相比于在动态区闲逛，你应该【优先考虑】是否需要主动给用户发消息来维系你们的感情。
 ${chat.settings.enableTimePerception ? `
 # 【情景感知】
-- **时间**: 感知到当前是${now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' })}。
+- **时间**: 感知到当前是${currentTime} (${timeOfDayGreeting})}。
 - **对话状态**: ${timeContextText}
 ${longTimeNoSee ? `【重要提示】你们已经很久没聊天了！你【必须】将本次行动的重点放在使用 'text' 指令给用户发消息，主动开启一个新的、有趣的话题来重新建立联系。绝对不要只是点赞或评论动态，那会显得你很冷漠！` : ''}` : ''}
 
@@ -20527,7 +21045,7 @@ ${longTimeNoSee ? `【重要提示】你们已经很久没聊天了！你【必�
         -   **你的角色设定**: ${chat.settings.aiPersona}
         ${worldBookContent}
         ${linkedMemoryContext}
-        ${chat.settings.enableTimePerception ? `-   **当前时间**: ${now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' })}` : ''}
+        ${chat.settings.enableTimePerception ? `-   **当前时间**:${currentTime} (${timeOfDayGreeting})` : ''}
         ${chat.settings.enableTimePerception ? `-   **对话状态**: ${timeContextText}` : ''}
         -   **你们最后的对话摘要**: ${recentContextSummary}
         ${dynamicContext}`;
@@ -20858,8 +21376,11 @@ for (const action of responseArray) {
             } else {
                 // 3. 如果没有红包事件，才执行原来的通用聊天逻辑
                 let timeContextText = '';
-                const chinaTime = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (3600000 * 8));
-                const currentTime = chinaTime.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', dateStyle: 'full', timeStyle: 'short' });
+    // ▼▼▼ 核心修复：在这里也使用您为该群聊选择的时区 ▼▼▼
+    const selectedTimeZone = chat.settings.timeZone || 'Asia/Shanghai';
+    const currentTime = now.toLocaleString('zh-CN', { timeZone: selectedTimeZone, dateStyle: 'full', timeStyle: 'short' });
+    const localizedDate = new Date(now.toLocaleString('en-US', { timeZone: selectedTimeZone }));
+    // ▲▲▲ 修复结束 ▲▲▲
 
                 // 【核心修改】只有当时间感知开启时，才计算时间差
                 if (chat.settings.enableTimePerception) {
@@ -29078,36 +29599,42 @@ ${boardString}
          * @param {string} chatId - 当前聊天的ID
          * @returns {Promise<string>} - 处理后的HTML字符串
          */
-        async function applyRenderingRules(rawContent, chatId) {
-            // 如果内容本身已经是HTML标签，或者不含可能是“暗号”的字符，直接返回，提高性能
-            if (rawContent.trim().startsWith('<') || (!rawContent.includes('[') && !rawContent.includes('{'))) {
-                return rawContent;
+async function applyRenderingRules(rawContent, chatId) {
+    // 如果内容是简单文本或HTML，直接返回以提高性能
+    if (rawContent.trim().startsWith('<') || (!rawContent.includes('[') && !rawContent.includes('{'))) {
+        return rawContent;
+    }
+
+    // --- 核心优化：缓存逻辑 ---
+    if (!ruleCache[chatId]) { // 检查当前聊天的规则是否已被缓存
+        console.log(`Caching rendering rules for chat: ${chatId}`);
+        // 如果没有，就从数据库查询一次
+        const applicableRules = await db.renderingRules
+            .where('chatId').equals('global')
+            .or('chatId').equals(chatId)
+            .toArray();
+        // 将查询结果存入缓存，下次就不用再查了
+        ruleCache[chatId] = applicableRules.filter(r => r.isEnabled);
+    }
+    const rules = ruleCache[chatId]; // 从缓存中读取规则
+    // --- 优化结束 ---
+
+    let processedContent = rawContent;
+
+    for (const rule of rules) {
+        try {
+            const regex = new RegExp(rule.regex, 'g');
+            let testContent = processedContent; 
+            if (regex.test(testContent)) {
+                processedContent = processedContent.replace(regex, rule.template);
             }
-            
-            // 获取所有公用规则和当前角色专属的规则
-            const applicableRules = await db.renderingRules
-                .where('chatId').equals('global')
-                .or('chatId').equals(chatId)
-                .toArray();
-        
-            let processedContent = rawContent;
-            
-            // 只处理启用的规则
-            for (const rule of applicableRules.filter(r => r.isEnabled)) {
-                try {
-                    // 'g'标志是必须的，用于全局替换
-                    const regex = new RegExp(rule.regex, 'g');
-                    if (regex.test(processedContent)) {
-                        processedContent = processedContent.replace(regex, rule.template);
-                    }
-                } catch (e) {
-                    console.error(`渲染规则 [${rule.name}] 的正则表达式无效:`, e);
-                    // 跳过错误的规则，不中断渲染流程
-                }
-            }
-            
-            return processedContent;
+        } catch (e) {
+            console.error(`渲染规则 [${rule.name}] 的正则表达式无效:`, e);
         }
+    }
+
+    return processedContent;
+}
         
         // ▲▲▲ 核心JS代码粘贴结束 ▲▲▲
         /**
@@ -29872,9 +30399,6 @@ async function getLyricsForSong(songId, source) {
     return "";
 }
 
-/**
- * 【V3.0 | 全新】这是手动导入歌词的专属功能函数
- */
 async function handleManualLrcImport(trackIndex) {
     if (trackIndex < 0 || trackIndex >= musicState.playlist.length) return;
 
@@ -29906,10 +30430,14 @@ async function handleManualLrcImport(trackIndex) {
         const pastedText = await showCustomPrompt('粘贴歌词', '请在此处粘贴完整的LRC格式歌词...', '', 'textarea');
         if (pastedText) lrcContent = pastedText.replace(/\[/g, '\n[').trim();
     }
-    
+
     if (lrcContent !== null) {
         musicState.playlist[trackIndex].lrcContent = lrcContent;
-        await saveGlobalPlaylist();
+
+        // ▼▼▼ 【核心修复】在这里添加下面这行代码 ▼▼▼
+        await saveGlobalPlaylist(); // 将更新后的播放列表保存到数据库
+        // ▲▲▲ 修复结束 ▲▲▲
+
         if (musicState.currentIndex === trackIndex) {
             musicState.parsedLyrics = parseLRC(lrcContent);
             renderLyrics();
@@ -29918,6 +30446,56 @@ async function handleManualLrcImport(trackIndex) {
         await showCustomAlert('成功', `《${musicState.playlist[trackIndex].name}》的歌词已成功保存！`);
     }
 }
+
+/**
+ * 【全新】切换当前播放歌曲的背景模糊效果
+ */
+async function toggleBackgroundBlur() {
+    if (musicState.currentIndex === -1) return;
+
+    const track = musicState.playlist[musicState.currentIndex];
+    if (!track) return;
+
+    // 切换状态，如果之前是清晰的，就变为模糊，反之亦然
+    track.isBgClear = !track.isBgClear;
+
+    // 将这个新的设置保存到数据库
+    await saveGlobalPlaylist();
+
+    // 更新UI
+    const playerWindow = document.querySelector('.music-player-window');
+    const toggleBtn = document.getElementById('toggle-blur-btn');
+    
+    playerWindow.classList.toggle('bg-clear', track.isBgClear);
+    toggleBtn.classList.toggle('active', track.isBgClear);
+}
+
+/**
+ * 【全新】切换音乐播放器全屏模式下的头像显示
+ */
+function toggleMusicPlayerAvatars() {
+    const avatarDisplay = document.getElementById('music-player-avatar-display');
+    const toggleBtn = document.getElementById('show-avatars-btn');
+    if (avatarDisplay && toggleBtn) {
+        avatarDisplay.classList.toggle('visible');
+        toggleBtn.classList.toggle('active');
+    }
+}
+
+/**
+ * 【全新】切换音乐播放器的全屏/窗口模式
+ */
+function togglePlayerFullscreen() {
+    const playerWindow = document.querySelector('.music-player-window');
+    const overlay = document.getElementById('music-player-overlay');
+    if (playerWindow && overlay) {
+        // 核心逻辑：切换 fullscreen 和 fullscreen-active 这两个类
+        playerWindow.classList.toggle('fullscreen');
+        overlay.classList.toggle('fullscreen-active');
+    }
+}
+// 暴露到全局，以便在某些特殊情况下可以从外部调用
+window.togglePlayerFullscreen = togglePlayerFullscreen;
 
 /**
  * 【全新】清理音乐播放列表中的所有无效或无法播放的歌曲链接
@@ -33357,10 +33935,11 @@ async function handleGenerateDoubanPosts() {
     
     const now = new Date();
     const currentTimeString = now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' });
-
+    const minPosts = state.globalSettings.doubanMinPosts || 12;
+    const maxPosts = state.globalSettings.doubanMaxPosts || 20;
     const systemPrompt = `
 # 你的任务
-你是一个虚拟社区内容生成器。你的任务是根据下面提供的【统一角色列表】，虚构出【12到20篇】他们最近可能会在各种豆瓣小组中发布的帖子和评论。
+你是一个虚拟社区内容生成器。你的任务是根据下面提供的【统一角色列表】，虚构出【${minPosts}到${maxPosts}篇】他们最近可能会在各种豆瓣小组中发布的帖子和评论。
 
 # 核心规则
 1.  **【时间感知】**:
@@ -35532,7 +36111,51 @@ function showUpdateNotice(version, contentHtml) {
 }
 
 // ▲▲▲ 新增JS代码结束 ▲▲▲
+// ▼▼▼ 【全新】这是豆瓣设置功能的【全部核心JS代码】，请完整粘贴 ▼▼▼
 
+/**
+ * 【总入口】打开豆瓣设置弹窗
+ */
+function openDoubanSettingsModal() {
+    const modal = document.getElementById('douban-settings-modal');
+    
+    // 从全局设置中读取已保存的值，如果没有就使用默认值
+    document.getElementById('douban-min-posts-input').value = state.globalSettings.doubanMinPosts || 12;
+    document.getElementById('douban-max-posts-input').value = state.globalSettings.doubanMaxPosts || 20;
+    
+    modal.classList.add('visible');
+}
+
+/**
+ * 保存豆瓣设置
+ */
+async function saveDoubanSettings() {
+    const minInput = document.getElementById('douban-min-posts-input');
+    const maxInput = document.getElementById('douban-max-posts-input');
+    
+    const min = parseInt(minInput.value);
+    const max = parseInt(maxInput.value);
+
+    // 数据验证
+    if (isNaN(min) || isNaN(max) || min < 1 || max < 1) {
+        alert("请输入有效的正整数！");
+        return;
+    }
+    if (min > max) {
+        alert("最小帖子数不能大于最大帖子数！");
+        return;
+    }
+
+    // 保存到全局状态和数据库
+    state.globalSettings.doubanMinPosts = min;
+    state.globalSettings.doubanMaxPosts = max;
+    await db.globalSettings.put(state.globalSettings);
+
+    // 关闭弹窗并提示用户
+    document.getElementById('douban-settings-modal').classList.remove('visible');
+    await showCustomAlert('保存成功', '豆瓣设置已更新！下次重新生成时将生效。');
+}
+// ▲▲▲ 新增JS代码粘贴结束 ▲▲▲
               // ===================================================================
                 // 4. 初始化函数 init()
                 // ===================================================================
@@ -35885,7 +36508,7 @@ document.getElementById('cleanup-data-btn').addEventListener('click', cleanupRed
                     document.getElementById('import-data-input').addEventListener('change', e => importBackup(e.target.files[0]));
                     document.getElementById('import-card-input').addEventListener('change', handleCardImport);
                     document.getElementById('back-to-list-btn').addEventListener('click', () => { 
-
+               ruleCache = {};
             // ▼▼▼ 修改这两行 ▼▼▼
             applyScopedCss('', '#chat-messages', 'custom-bubble-style'); // 清除真实聊天界面的自定义样式
             applyScopedCss('', '#settings-preview-area', 'preview-bubble-style'); // 清除预览区的自定义样式
@@ -35955,6 +36578,29 @@ document.getElementById('cleanup-data-btn').addEventListener('click', cleanupRed
                     document.getElementById('add-song-url-btn').addEventListener('click', addSongFromURL);
                     document.getElementById('add-song-local-btn').addEventListener('click', () => document.getElementById('local-song-upload-input').click());
                     document.getElementById('local-song-upload-input').addEventListener('change', addSongFromLocal);
+// ▼▼▼ 【全新】这是修复按钮点击无响应的核心代码 ▼▼▼
+document.getElementById('playlist-body').addEventListener('click', (e) => {
+    const target = e.target;
+    const trackIndex = parseInt(target.dataset.index);
+
+    if (isNaN(trackIndex)) return;
+
+    if (target.classList.contains('album-art-btn')) {
+        handleChangeAlbumArt(trackIndex);
+    } else if (target.classList.contains('lyrics-btn')) {
+        handleManualLrcImport(trackIndex);
+    } else if (target.classList.contains('bg-btn')) {
+        handleChangeBackground(trackIndex);
+    } else if (target.classList.contains('delete-track-btn')) {
+        deleteTrack(trackIndex);
+    }
+});
+// ▲▲▲ 新增代码粘贴结束 ▲▲▲
+                    audioPlayer.addEventListener('ended', () => {
+    // 歌曲播放结束时，移除旋转样式
+    document.getElementById('vinyl-view').classList.remove('spinning');
+    playNext(); 
+});
                     audioPlayer.addEventListener('ended', () => {
     // 歌曲播放结束时，移除旋转样式
     document.getElementById('vinyl-view').classList.remove('spinning');
@@ -36302,38 +36948,43 @@ document.getElementById('save-world-book-btn').addEventListener('click', async (
                 }
             }
         
-            const voiceBody = e.target.closest('.voice-message-body');
-            if (voiceBody) {
-                const bubble = voiceBody.closest('.message-bubble');
-                if (!bubble) return;
-                
-                const spinner = voiceBody.querySelector('.loading-spinner');
-                const transcriptEl = bubble.querySelector('.voice-transcript');
+    // 【【【这就是修复后的语音消息处理逻辑】】】
+    const voiceBody = e.target.closest('.voice-message-body');
+    if (voiceBody) {
+        const bubble = voiceBody.closest('.message-bubble');
+        if (!bubble) return;
         
-                if (bubble.dataset.state === 'loading') {
-                    return;
+        const spinner = voiceBody.querySelector('.loading-spinner');
+        const transcriptEl = bubble.querySelector('.voice-transcript');
+
+        if (bubble.dataset.state === 'loading') {
+            return;
+        }
+
+        // 核心逻辑：判断当前状态并执行反向操作
+        if (bubble.dataset.state === 'expanded') {
+            // 如果已展开，则折叠
+            transcriptEl.style.display = 'none';
+            bubble.dataset.state = 'collapsed'; // 更新状态
+        } 
+        else {
+            // 如果是折叠或初始状态，则展开
+            bubble.dataset.state = 'loading';
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                if (document.body.contains(bubble)) {
+                    const voiceText = bubble.dataset.voiceText || '(无法识别)';
+                    transcriptEl.textContent = voiceText;
+                    
+                    spinner.style.display = 'none';
+                    transcriptEl.style.display = 'block';
+                    bubble.dataset.state = 'expanded'; // 更新状态
                 }
-        
-                if (bubble.dataset.state === 'expanded') {
-                    transcriptEl.style.display = 'none';
-                    bubble.dataset.state = 'collapsed';
-                } 
-                else {
-                    bubble.dataset.state = 'loading';
-                    spinner.style.display = 'block';
-        
-                    setTimeout(() => {
-                        if (document.body.contains(bubble)) {
-                            const voiceText = bubble.dataset.voiceText || '(无法识别)';
-                            transcriptEl.textContent = voiceText;
-                            
-                            spinner.style.display = 'none';
-                            transcriptEl.style.display = 'block';
-                            bubble.dataset.state = 'expanded';
-                        }
-                    }, 1500);
-                }
-            }
+            }, 1500);
+        }
+        return;
+    }
         
             const placeholder = e.target.closest('.recalled-message-placeholder');
             if (placeholder) {
@@ -36430,6 +37081,7 @@ document.getElementById('save-world-book-btn').addEventListener('click', async (
             document.getElementById('my-persona').value = chat.settings.myPersona;
             document.getElementById('my-avatar-preview').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
             document.getElementById('max-memory').value = chat.settings.maxMemory;
+            document.getElementById('linked-memory-count').value = chat.settings.linkedMemoryCount || 10;
             const bgPreview = document.getElementById('bg-preview');
             const removeBgBtn = document.getElementById('remove-bg-btn');
             if (chat.settings.background) {
@@ -36447,7 +37099,25 @@ document.getElementById('group-background-activity-group').style.display = isGro
 
 // (后续的赋值逻辑，请用下面这整块新代码完整替换)
 // 【新增代码】读取时间感知设置
-document.getElementById('time-perception-toggle').checked = chat.settings.enableTimePerception;
+// 【新增代码】读取时间感知设置并控制时区选择器显隐
+const timePerceptionToggle = document.getElementById('time-perception-toggle');
+const timeZoneGroup = document.getElementById('time-zone-group');
+timePerceptionToggle.checked = chat.settings.enableTimePerception;
+timeZoneGroup.style.display = timePerceptionToggle.checked ? 'block' : 'none';
+
+// 填充时区下拉列表
+const timezoneSelect = document.getElementById('time-zone-select');
+// Intl.supportedValuesOf('timeZone') 是浏览器内置的API，可以获取所有支持的时区
+const timezones = Intl.supportedValuesOf('timeZone');
+timezoneSelect.innerHTML = ''; // 清空旧选项
+timezones.forEach(tz => {
+    const option = document.createElement('option');
+    option.value = tz;
+    option.textContent = tz;
+    timezoneSelect.appendChild(option);
+});
+// 设置当前选中的时区，如果没设置过，则默认为上海
+timezoneSelect.value = chat.settings.timeZone || 'Asia/Shanghai';
 if (isGroup) {
     // 【核心新增】读取并设置群聊开关的状态
     document.getElementById('group-background-activity-switch').checked = chat.settings.enableBackgroundActivity;
@@ -36659,6 +37329,10 @@ await renderOfflinePresetSelector(chat);
             chat.settings.customCss = document.getElementById('custom-css-input').value.trim();
 // 【新增代码】保存时间感知设置
 chat.settings.enableTimePerception = document.getElementById('time-perception-toggle').checked;
+chat.settings.timeZone = document.getElementById('time-zone-select').value;
+document.getElementById('time-perception-toggle').addEventListener('change', (e) => {
+    document.getElementById('time-zone-group').style.display = e.target.checked ? 'block' : 'none';
+});
             chat.settings.myPersona = document.getElementById('my-persona').value;
             chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
         
@@ -38647,47 +39321,7 @@ document.getElementById('close-call-transcript-btn').addEventListener('click', (
         
         // ▲▲▲ 替换结束 ▲▲▲
         
-        document.getElementById('chat-messages').addEventListener('click', (e) => {
-            // 1. 检查点击的是否是语音条
-            const voiceBody = e.target.closest('.voice-message-body');
-            if (!voiceBody) return;
-        
-            // 2. 找到相关的DOM元素
-            const bubble = voiceBody.closest('.message-bubble');
-            if (!bubble) return;
-            
-            const spinner = voiceBody.querySelector('.loading-spinner');
-            const transcriptEl = bubble.querySelector('.voice-transcript');
-        
-            // 如果正在加载中，则不响应点击
-            if (bubble.dataset.state === 'loading') {
-                return;
-            }
-        
-            // 3. 如果文字已经展开，则收起
-            if (bubble.dataset.state === 'expanded') {
-                transcriptEl.style.display = 'none';
-                bubble.dataset.state = 'collapsed';
-            } 
-            // 4. 如果是收起状态，则开始“转录”流程
-            else {
-                bubble.dataset.state = 'loading'; // 进入加载状态
-                spinner.style.display = 'block';   // 显示加载动画
-        
-                // 模拟1.5秒的语音识别过程
-                setTimeout(() => {
-                    // 检查此时元素是否还存在（可能用户已经切换了聊天）
-                    if (document.body.contains(bubble)) {
-                        const voiceText = bubble.dataset.voiceText || '(无法识别)';
-                        transcriptEl.textContent = voiceText; // 填充文字
-                        
-                        spinner.style.display = 'none';      // 隐藏加载动画
-                        transcriptEl.style.display = 'block';// 显示文字
-                        bubble.dataset.state = 'expanded';     // 进入展开状态
-                    }
-                }, 1500);
-            }
-        });
+
         
         document.getElementById('chat-header-status').addEventListener('click', handleEditStatusClick);
         
@@ -38811,65 +39445,58 @@ document.getElementById('close-call-transcript-btn').addEventListener('click', (
             } 
         });
         
-        // ▼▼▼ 【最终修复版】请用这个全新的事件监听器，替换旧的 playlist-body 监听器 ▼▼▼
-        
-        document.getElementById('playlist-body').addEventListener('click', async (e) => {
-            const target = e.target;
-            
-            // 点击“词”按钮
-            const lyricsBtn = target.closest('.lyrics-btn');
-            if (lyricsBtn) {
-                const index = parseInt(lyricsBtn.dataset.index);
-                if (isNaN(index)) return;
+// ▼▼▼ 【最终修复版】请用这个全新的事件监听器，替换旧的 playlist-body 监听器 ▼▼▼
 
-                // 【核心修复1】调用函数并等待用户上传或粘贴歌词
-                const newLrcContent = await handleManualLrcImport(index);
+document.getElementById('playlist-body').addEventListener('click', async (e) => {
+    const target = e.target;
+    // 【【【核心新增逻辑就在这里！】】】
+    // 点击“专辑”按钮
+    const albumArtBtn = target.closest('.album-art-btn');
+    if (albumArtBtn) {
+        const index = parseInt(albumArtBtn.dataset.index);
+        if (!isNaN(index)) {
+            // 调用我们刚刚添加的新函数
+            await handleChangeAlbumArt(index);
+        }
+        return; // 处理完后直接退出
+    }
+    // 点击“词”按钮
+    const lyricsBtn = target.closest('.lyrics-btn');
+    if (lyricsBtn) {
+        const index = parseInt(lyricsBtn.dataset.index);
+        if (isNaN(index)) return;
 
-                // 【核心修复2】如果用户没有取消，并且我们得到了歌词内容
-                if (newLrcContent !== null) {
-                    // a. 更新内存中的歌曲数据
-                    musicState.playlist[index].lrcContent = newLrcContent;
-                    
-                    // b. 将更新后的整个播放列表保存到数据库
-                    await saveGlobalPlaylist();
-                    
-                    // c. 如果当前正在播放的就是这首歌，立即刷新歌词显示
-                    if (musicState.currentIndex === index) {
-                        musicState.parsedLyrics = parseLRC(newLrcContent);
-                        renderLyrics(); // 重新渲染歌词列表
-                        updateLyricsUI(); // 更新UI高亮
-                    }
-                    
-                    // d. 给用户一个成功的提示
-                    await showCustomAlert('成功', `《${musicState.playlist[index].name}》的歌词已成功保存！`);
-                }
-                return;
-            }
-        
-            // 点击“删除”按钮 (这部分逻辑不变)
-            const deleteBtn = target.closest('.delete-track-btn');
-            if (deleteBtn) {
-                const index = parseInt(deleteBtn.dataset.index);
-                if (isNaN(index)) return;
-                const track = musicState.playlist[index];
-                const confirmed = await showCustomConfirm('删除歌曲', `确定要从播放列表中删除《${track.name}》吗？`);
-                if (confirmed) {
-                    deleteTrack(index);
-                }
-                return;
-            }
-        
-            // 点击歌曲信息区域 -> 播放歌曲 (这部分逻辑不变)
-            const itemInfo = target.closest('.playlist-item-info');
-            if (itemInfo) {
-                const item = itemInfo.closest('.playlist-item');
-                const index = Array.from(item.parentElement.children).indexOf(item);
-                if (index > -1) {
-                    playSong(index);
-                }
-            }
-        });
-        // ▲▲▲ 替换结束 ▲▲▲
+        // 【核心修复】我们现在只调用函数，不再需要处理它的返回值。
+        // 因为所有必要的逻辑（包括保存）都已经在函数内部完成了。
+        await handleManualLrcImport(index);
+
+        return; // 处理完后直接退出
+    }
+
+    // 点击“删除”按钮 (这部分逻辑不变)
+    const deleteBtn = target.closest('.delete-track-btn');
+    if (deleteBtn) {
+        const index = parseInt(deleteBtn.dataset.index);
+        if (isNaN(index)) return;
+        const track = musicState.playlist[index];
+        const confirmed = await showCustomConfirm('删除歌曲', `确定要从播放列表中删除《${track.name}》吗？`);
+        if (confirmed) {
+            deleteTrack(index);
+        }
+        return;
+    }
+
+    // 点击歌曲信息区域 -> 播放歌曲 (这部分逻辑不变)
+    const itemInfo = target.closest('.playlist-item-info');
+    if (itemInfo) {
+        const item = itemInfo.closest('.playlist-item');
+        const index = Array.from(item.parentElement.children).indexOf(item);
+        if (index > -1) {
+            playSong(index);
+        }
+    }
+});
+// ▲▲▲ 替换结束 ▲▲▲
         
         document.querySelector('.progress-bar').addEventListener('click', (e) => {
             if (!audioPlayer.duration) return;
@@ -39489,6 +40116,9 @@ document.getElementById('search-results-list').addEventListener('click', (e) => 
 
 // ▼▼▼ 【全新】清理无效歌曲事件绑定 ▼▼▼
 document.getElementById('cleanup-songs-btn').addEventListener('click', cleanupInvalidSongs);
+document.getElementById('toggle-blur-btn').addEventListener('click', toggleBackgroundBlur);
+ document.getElementById('toggle-fullscreen-btn').addEventListener('click', togglePlayerFullscreen);
+document.getElementById('show-avatars-btn').addEventListener('click', toggleMusicPlayerAvatars);
 // ▲▲▲ 新增事件绑定结束 ▲▲▲
 // ▼▼▼ 【全新】为状态栏开关添加实时预览事件 ▼▼▼
 document.getElementById('status-bar-toggle-switch').addEventListener('change', () => {
@@ -40012,6 +40642,32 @@ document.getElementById('chat-lock-overlay').addEventListener('click', (e) => {
     }
     // (注意：主按钮 spectator-propel-btn 的事件已在 renderChatInterface 中直接绑定，这里无需处理)
 });
+addLongPressListener(document.getElementById('music-visual-container'), () => { if (musicState.currentIndex > -1) { handleChangeAlbumArt(musicState.currentIndex); } });
+document.getElementById('douban-settings-btn').addEventListener('click', openDoubanSettingsModal);
+document.getElementById('save-douban-settings-btn').addEventListener('click', saveDoubanSettings);
+document.getElementById('cancel-douban-settings-btn').addEventListener('click', () => {
+    document.getElementById('douban-settings-modal').classList.remove('visible');
+});
+// ▼▼▼ 【全新】为时区搜索框添加事件监听 ▼▼▼
+document.getElementById('time-zone-search-input').addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const selectEl = document.getElementById('time-zone-select');
+    
+    // 遍历下拉列表中的每一个选项
+    for (const option of selectEl.options) {
+        const optionText = option.textContent.toLowerCase();
+        
+        // 如果选项的文本内容包含了用户输入的搜索词，就显示它
+        if (optionText.includes(searchTerm)) {
+            option.style.display = ''; // 恢复显示
+        } else {
+            // 否则就隐藏它
+            option.style.display = 'none';
+        }
+    }
+});
+// ▲▲▲ 新增JS代码结束 ▲▲▲
+
 
 
 
@@ -40209,6 +40865,35 @@ document.getElementById('chat-lock-overlay').addEventListener('click', (e) => {
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+<!-- ▼▼▼ 【全新】这是豆瓣设置的弹窗，请粘贴到 body 底部 ▼▼▼ -->
+<div id="douban-settings-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>豆瓣设置</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group douban-settings-item">
+                <label for="douban-min-posts-input">
+                    每次生成帖子数范围
+                    <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
+                        设置AI在豆瓣页面一次性生成帖子的最小和最大数量。
+                    </p>
+                </label>
+                <div class="douban-settings-controls">
+                    <input type="number" id="douban-min-posts-input" min="1" value="12">
+                    <span>到</span>
+                    <input type="number" id="douban-max-posts-input" min="1" value="20">
+                    <span>篇</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="cancel-douban-settings-btn">取消</button>
+            <button class="save" id="save-douban-settings-btn">保存</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
 <audio id="char-audio-player" preload="auto"></audio>
 <!-- ▼▼▼ 【全新】豆瓣角色选择弹窗 ▼▼▼ -->
 <div id="douban-cast-modal" class="modal">
@@ -40244,6 +40929,7 @@ document.getElementById('chat-lock-overlay').addEventListener('click', (e) => {
 <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
 </body>
 </html>
+
 
 
 
