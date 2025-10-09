@@ -9426,6 +9426,9 @@ input, textarea, select {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex-grow: 1;      /* 核心修复1：让日志区填满所有剩余空间 */
+    overflow-y: auto; 
+    min-height: 0;     
 }
 .werewolf-log-entry {
     background-color: rgba(255, 255, 255, 0.08);
@@ -9549,37 +9552,6 @@ input, textarea, select {
         }
 
         /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
-/* ▼▼▼ 【全新】这是为狼人杀页面添加的独立样式 ▼▼▼ */
-
-/* ▼▼▼ 【最终修复版】这是让狼人杀页面宽度绝对稳定的样式 ▼▼▼ */
-#werewolf-game-screen {
-    /* 1. 使用四个方向的定位来“钉住”屏幕，强制撑满 */
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;  /* <-- 核心新增：约束右边缘 */
-    bottom: 0; /* <-- 核心新增：约束下边缘 (比 height: 100% 更可靠) */
-    
-    /* 2. 移除旧的 width 和 height，因为上面四个属性已经定义了尺寸 */
-    /* width: 100%; */
-    /* height: 100%; */
-
-    /* 3. 其他布局和外观样式保持不变 */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: #2c2c2e;
-    color: white;
-    z-index: 50;
-    display: none;
-}
-/* ▲▲▲ 替换结束 ▲▲▲ */
-
-/* 当我们想显示它时，给它添加一个 .active 类即可 */
-#werewolf-game-screen.active {
-    display: flex;
-}
-/* ▲▲▲ 新增CSS结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -36539,10 +36511,7 @@ async function openWerewolfLobby(mode) {
             const myPlayer = werewolfGameState.players.find(p => p.id === 'user');
 
             renderWerewolfScreen();
-            // 隐藏所有其他 .screen 页面
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // 通过添加 .active 类来独立显示狼人杀页面
-            document.getElementById('werewolf-game-screen').classList.add('active');
+            showScreen('werewolf-game-screen');
             
             showMyRole(myPlayer.role);
         }
@@ -42552,22 +42521,17 @@ document.getElementById('start-werewolf-game-btn').addEventListener('click', ini
             executeNightPhase(); // 确认身份后，正式进入夜晚
         });
         
-document.getElementById('exit-werewolf-game-btn').addEventListener('click', async () => {
+        document.getElementById('exit-werewolf-game-btn').addEventListener('click', async () => {
             const confirmed = await showCustomConfirm('退出游戏', '确定要退出当前这局狼人杀吗？游戏进度将不会被保存。', {confirmButtonClass: 'btn-danger'});
             if (confirmed) {
                 werewolfGameState.isActive = false;
-                // 先手动隐藏狼人杀页面
-                document.getElementById('werewolf-game-screen').classList.remove('active');
-                // 然后再显示目标页面
+                // 根据游戏是从哪里发起的，返回到不同的界面
                 showScreen(werewolfGameState.chatId ? 'chat-interface-screen' : 'home-screen');
             }
         });
 
-document.getElementById('werewolf-game-over-close-btn').addEventListener('click', () => {
+        document.getElementById('werewolf-game-over-close-btn').addEventListener('click', () => {
             document.getElementById('werewolf-game-over-modal').classList.remove('visible');
-            // 先手动隐藏狼人杀页面
-            document.getElementById('werewolf-game-screen').classList.remove('active');
-            // 然后再显示目标页面
             showScreen(werewolfGameState.chatId ? 'chat-list-screen' : 'home-screen');
         });
 
@@ -42873,7 +42837,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
 </div>
 
 <!-- ▼▼▼ 【全新V2.0 | 交互修复版】请用这整块代码，完整替换旧的 werewolf-game-screen ▼▼▼ -->
-        <div id="werewolf-game-screen">
+        <div id="werewolf-game-screen" class="screen">
             <div class="header">
                 <span id="werewolf-game-title">狼人杀</span>
                 <div class="header-actions">
