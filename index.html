@@ -11588,6 +11588,63 @@ input, textarea, select {
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+    <!-- ▼▼▼ 【全新】请用这整块代码，完整替换旧的 rendering-rules-screen ▼▼▼ -->
+    <div id="rendering-rules-screen" class="screen">
+        <div class="header">
+            <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
+            <span>渲染规则</span>
+            <span class="action-btn" id="add-new-rule-btn">+</span>
+        </div>
+        <!-- 【核心修改1】全新的页签和内容区结构 -->
+        <div id="rules-tabs">
+            <!-- JS 会在这里动态生成页签 -->
+        </div>
+        <div id="rules-content-container">
+            <!-- JS 会在这里动态生成内容面板 -->
+        </div>
+    </div>
+    <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+    <!-- 2. 规则编辑器模态框 -->
+    <div id="rule-editor-modal" class="modal">
+        <div class="modal-content" style="height: 85%;">
+            <div class="modal-header">
+                <span id="rule-editor-title">创建新规则</span>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+                <div class="form-group" style="flex-shrink: 0;">
+                    <label for="rule-name-input">规则名称</label>
+                    <input type="text" id="rule-name-input" placeholder="例如：美团外卖卡片">
+                </div>
+                <div class="form-group" style="flex-shrink: 0;">
+                    <label for="rule-chat-id-select">绑定范围</label>
+                    <select id="rule-chat-id-select">
+                        <option value="global">公用 (所有角色)</option>
+                        <!-- 角色列表将由JS动态填充 -->
+                    </select>
+                </div>
+                <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+                    <label for="rule-regex-input">正则表达式 (使用g作为标志)</label>
+                    <textarea id="rule-regex-input" rows="3" style="font-family: monospace; resize: vertical;" placeholder="例如：MTR\[(.*?)\]\[(.*?)\|(.*?)\]"></textarea>
+                </div>
+                <div class="form-group" style="flex-grow: 2; display: flex; flex-direction: column;">
+                    <label for="rule-template-input">HTML 模板 (用 $1, $2 引用)</label>
+                    <textarea id="rule-template-input" rows="6" style="font-family: monospace; resize: vertical;" placeholder="例如：<div class=`waimai-card`>...<span>$2</span>...</div>"></textarea>
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                    <label for="rule-enabled-switch" style="margin-bottom: 0;">启用规则</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="rule-enabled-switch" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel" id="cancel-rule-editor-btn">取消</button>
+                <button class="save" id="save-rule-btn">保存规则</button>
+            </div>
+        </div>
+    </div>
+    <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 <!-- =================================================================== -->
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 <!-- =================================================================== -->
@@ -42703,63 +42760,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
         </div>
     </div>
     <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-    <!-- ▼▼▼ 【全新】请用这整块代码，完整替换旧的 rendering-rules-screen ▼▼▼ -->
-    <div id="rendering-rules-screen" class="screen">
-        <div class="header">
-            <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
-            <span>渲染规则</span>
-            <span class="action-btn" id="add-new-rule-btn">+</span>
-        </div>
-        <!-- 【核心修改1】全新的页签和内容区结构 -->
-        <div id="rules-tabs">
-            <!-- JS 会在这里动态生成页签 -->
-        </div>
-        <div id="rules-content-container">
-            <!-- JS 会在这里动态生成内容面板 -->
-        </div>
-    </div>
-    <!-- ▲▲▲ 替换结束 ▲▲▲ -->
-    <!-- 2. 规则编辑器模态框 -->
-    <div id="rule-editor-modal" class="modal">
-        <div class="modal-content" style="height: 85%;">
-            <div class="modal-header">
-                <span id="rule-editor-title">创建新规则</span>
-            </div>
-            <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
-                <div class="form-group" style="flex-shrink: 0;">
-                    <label for="rule-name-input">规则名称</label>
-                    <input type="text" id="rule-name-input" placeholder="例如：美团外卖卡片">
-                </div>
-                <div class="form-group" style="flex-shrink: 0;">
-                    <label for="rule-chat-id-select">绑定范围</label>
-                    <select id="rule-chat-id-select">
-                        <option value="global">公用 (所有角色)</option>
-                        <!-- 角色列表将由JS动态填充 -->
-                    </select>
-                </div>
-                <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-                    <label for="rule-regex-input">正则表达式 (使用g作为标志)</label>
-                    <textarea id="rule-regex-input" rows="3" style="font-family: monospace; resize: vertical;" placeholder="例如：MTR\[(.*?)\]\[(.*?)\|(.*?)\]"></textarea>
-                </div>
-                <div class="form-group" style="flex-grow: 2; display: flex; flex-direction: column;">
-                    <label for="rule-template-input">HTML 模板 (用 $1, $2 引用)</label>
-                    <textarea id="rule-template-input" rows="6" style="font-family: monospace; resize: vertical;" placeholder="例如：<div class=`waimai-card`>...<span>$2</span>...</div>"></textarea>
-                </div>
-                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-                    <label for="rule-enabled-switch" style="margin-bottom: 0;">启用规则</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="rule-enabled-switch" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="cancel" id="cancel-rule-editor-btn">取消</button>
-                <button class="save" id="save-rule-btn">保存规则</button>
-            </div>
-        </div>
-    </div>
-    <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 请将这个【全新的 <audio> 标签】粘贴到 <body> 标签的最末尾，紧邻 </body> 之前 ▼▼▼ -->
 <audio id="notification-sound-player" preload="auto"></audio>
 <!-- ▲▲▲ 粘贴结束 ▲▲▲ -->
