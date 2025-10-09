@@ -9375,13 +9375,25 @@ input, textarea, select {
     border-color: #38383a;
 }
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
-/* ▼▼▼ 【全新】狼人杀游戏功能样式 ▼▼▼ */
+/* ▼▼▼ 【全新V3.1 | App化改造】这是狼人杀App的【全部CSS与JS】，请完整粘贴 ▼▼▼ */
 
-/* 游戏主屏幕布局 */
-#werewolf-game-screen {
+// ===================================================================
+// 1. CSS部分
+// ===================================================================
+#werewolf-app-screen {
     background-color: #2c2c2e; /* 深邃的背景，营造氛围 */
     color: white;
 }
+/* 大厅和游戏界面通用头部 */
+#werewolf-app-screen .header {
+    background-color: rgba(0,0,0,0.2);
+    border-bottom: 1px solid #444;
+}
+/* 大厅玩家选择列表 */
+#werewolf-player-selection-list {
+    padding: 0;
+}
+/* 游戏界面玩家网格 */
 #werewolf-player-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
@@ -9409,7 +9421,6 @@ input, textarea, select {
     font-weight: 500;
     text-shadow: 0 1px 2px black;
 }
-/* 死亡玩家的样式 */
 .werewolf-player-avatar.dead img {
     filter: grayscale(100%);
     border-color: #ff3b30;
@@ -9446,15 +9457,37 @@ input, textarea, select {
 
 /* 底部操作栏 */
 #werewolf-action-bar {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px 15px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    background-color: rgba(0,0,0,0.3);
     flex-shrink: 0;
-    text-align: center;
 }
-#werewolf-next-step-btn {
-    width: 100%;
+#werewolf-user-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+    font-size: 16px;
+    resize: none;
+    height: 40px;
+    box-sizing: border-box;
 }
+#werewolf-user-input::placeholder { color: #8d8d92; }
+#werewolf-action-bar button {
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 20px;
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+#werewolf-wait-reply-btn { background-color: #555; }
+#werewolf-finish-speech-btn { background-color: #c62828; }
 
 /* 角色揭示卡片样式 */
 #werewolf-role-card {
@@ -9470,10 +9503,7 @@ input, textarea, select {
     color: #ffc107;
     margin-bottom: 10px;
 }
-#werewolf-role-description {
-    font-size: 14px;
-    line-height: 1.6;
-}
+#werewolf-role-description { font-size: 14px; line-height: 1.6; }
 
 /* 选择列表的通用样式 (用于查人、投票等) */
 .werewolf-selection-item {
@@ -9493,98 +9523,7 @@ input, textarea, select {
     border-radius: 50%;
     margin-right: 15px;
 }
-.werewolf-selection-item .name {
-    font-weight: 500;
-}
-/* ▲▲▲ 狼人杀样式结束 ▲▲▲ */
-/* ▼▼▼ 【V3.0 | 狼人杀UI美化】请将这整块代码，粘贴到 <style> 标签的末尾 ▼▼▼ */
-
-        /* 1. 美化底部常驻输入栏的背景 */
-        #werewolf-game-screen #werewolf-action-bar {
-            background-color: rgba(0, 0, 0, 0.3); /* 半透明黑色背景，营造悬浮感 */
-            border-top: 1px solid rgba(255, 255, 255, 0.1); /* 顶部加一条微光分割线 */
-            padding: 10px 15px; /* 增加内边距 */
-            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* 适配iPhone底部安全区 */
-        }
-
-        /* 2. 【核心修复】让文本输入框能够动态伸缩 */
-        #werewolf-game-screen #werewolf-user-input {
-            flex-grow: 1; /* 这是最关键的一步，让输入框占据所有剩余空间 */
-            border: none;
-            padding: 10px 15px;
-            border-radius: 20px; /* 圆角 */
-            background-color: rgba(255, 255, 255, 0.1); /* 深色半透明背景 */
-            color: #f0f0f0; /* 浅色文字 */
-            font-size: 16px; /* 适配iOS，防止输入时放大 */
-            resize: none; /* 禁止拖动 */
-            height: 40px; /* 与主聊天框保持一致的高度 */
-            box-sizing: border-box;
-        }
-
-        /* 3. 美化输入框的占位符文字 */
-        #werewolf-game-screen #werewolf-user-input::placeholder {
-            color: #8d8d92; /* 暗灰色 */
-        }
-
-        /* 4. 美化操作按钮，使其与主聊天界面的发送按钮风格一致 */
-        #werewolf-game-screen #input-actions-wrapper button {
-            height: 40px;
-            padding: 0 15px;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            flex-shrink: 0; /* 防止按钮被挤压变形 */
-        }
-
-        /* 5. 美化“等待回应”和“继续讨论”按钮 (次要按钮) */
-        #werewolf-game-screen #werewolf-wait-reply-btn {
-            background-color: #555; /* 深灰色背景 */
-        }
-
-        /* 6. 美化“结束发言”和“进入投票”按钮 (主要按钮) */
-        #werewolf-game-screen #werewolf-finish-speech-btn {
-            background-color: #c62828; /* 暗红色，更有狼人杀氛围 */
-        }
-
-        /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
-/* ▼▼▼ 【全新】这是狼人杀App独立页面布局的样式 ▼▼▼ */
-
-/* 1. 为新的狼人杀主屏幕设置Flex布局和背景色 */
-#werewolf-screen {
-    display: flex;
-    flex-direction: column;
-    background-color: #2c2c2e; /* 统一的深色背景 */
-}
-
-/* 2. 让中间的内容容器能够自动拉伸并滚动 */
-#werewolf-screen .list-container {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 0; /* 移除容器的内边距，由内部元素控制 */
-}
-
-/* 3. 移除旧的日志容器的独立布局属性，因为它现在是滚动内容的一部分 */
-#werewolf-log {
-    flex-grow: 1; /* 让日志区域填满剩余空间 */
-    background: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 15px;
-}
-
-/* 4. 确保底部操作栏在最下方，并且有正确的背景和内边距 */
-#werewolf-screen #werewolf-action-bar {
-    flex-shrink: 0; /* 防止被压缩 */
-    background-color: rgba(0, 0, 0, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 10px 15px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
-}
-
-/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+.werewolf-selection-item .name { font-weight: 500; }
     </style>
 </head>
 <body>
@@ -9675,10 +9614,10 @@ input, textarea, select {
     <div class="icon-bg-desktop"><img id="icon-img-tutorial" src="https://i.postimg.cc/d10GjC4g/IMG-7302.jpg" alt="教程"></div>
     <span class="label">教程</span>
 </div>
-<div class="desktop-app-icon" onclick="openWerewolfLobby('global')">
-            <div class="icon-bg-desktop"><img id="icon-img-werewolf" src="https://i.postimg.cc/k401K5g7/IMG-7304.jpg" alt="狼人杀"></div>
-            <span class="label">狼人杀</span>
-        </div>
+<div class="desktop-app-icon" onclick="openWerewolfApp('global')">
+    <div class="icon-bg-desktop"><img id="icon-img-werewolf" src="https://i.postimg.cc/k401K5g7/IMG-7304.jpg" alt="狼人杀"></div>
+    <span class="label">狼人杀</span>
+</div>
      <!-- 悬浮X Logo - 只在主页面显示 -->
       <div id="floating-x-logo" class="floating-x-hidden">
         <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
@@ -36460,7 +36399,128 @@ async function openWerewolfLobby(mode) {
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
+/**
+ * 【全新 | 总入口】打开狼人杀App
+ * @param {'global' | 'group'} mode - 模式：'global'表示从游戏小屋进入，'group'表示从群聊进入
+ */
+async function openWerewolfApp(mode) {
+    // 渲染大厅界面
+    await renderWerewolfLobby(mode);
+    // 显示狼人杀App主屏幕
+    showScreen('werewolf-app-screen');
+}
 
+/**
+ * 【全新 | 渲染函数】渲染狼人杀游戏大厅（玩家选择界面）
+ * @param {'global' | 'group'} mode - 'global' 或 'group'
+ */
+async function renderWerewolfLobby(mode) {
+    const appScreen = document.getElementById('werewolf-app-screen');
+    
+    // 1. 动态构建大厅的HTML结构
+    appScreen.innerHTML = `
+        <div class="header">
+            <span class="back-btn">‹</span>
+            <span>游戏大厅</span>
+            <span style="width: 30px;"></span>
+        </div>
+        <div id="werewolf-player-selection-list" class="list-container">
+            <!-- 玩家列表将在这里生成 -->
+        </div>
+        <div style="padding: 15px; border-top: 1px solid #444;">
+            <button id="start-werewolf-game-btn" class="form-button">开始游戏</button>
+        </div>
+    `;
+
+    // 2. 填充玩家列表
+    const listEl = appScreen.querySelector('#werewolf-player-selection-list');
+    let potentialPlayers = [];
+    
+    if (mode === 'global') {
+        const characters = Object.values(state.chats).filter(c => !c.isGroup);
+        const npcs = await db.npcs.toArray();
+        potentialPlayers = [
+            { id: 'user', name: state.qzoneSettings.nickname || '我', avatar: state.qzoneSettings.avatar, type: 'user' },
+            ...characters.map(c => ({ id: c.id, name: c.name, avatar: c.settings.aiAvatar, type: 'character' })),
+            ...npcs.map(n => ({ id: `npc_${n.id}`, name: n.name, avatar: n.avatar, type: 'npc' }))
+        ];
+        werewolfGameState.chatId = null;
+    } else { // 从群聊发起
+        const chat = state.chats[state.activeChatId];
+        if (!chat || !chat.isGroup) return;
+        
+        potentialPlayers = [
+            { id: 'user', name: chat.settings.myNickname || '我', avatar: chat.settings.myAvatar, type: 'user' },
+            ...chat.members.map(m => {
+                const char = state.chats[m.id];
+                const memberAvatar = m.avatar || (char ? char.settings.aiAvatar : defaultGroupMemberAvatar);
+                return { id: m.id, name: m.groupNickname, avatar: memberAvatar, type: 'character' };
+            })
+        ];
+        werewolfGameState.chatId = state.activeChatId;
+    }
+
+    potentialPlayers.forEach(player => {
+        const item = document.createElement('div');
+        item.className = 'contact-picker-item';
+        item.innerHTML = `
+            <input type="checkbox" class="werewolf-player-checkbox" data-player-json='${JSON.stringify(player)}' ${player.type === 'user' ? 'checked disabled' : 'checked'}>
+            <img src="${player.avatar}" class="avatar">
+            <span class="name">${player.name}</span>
+        `;
+        listEl.appendChild(item);
+    });
+
+    // 3. 绑定事件
+    appScreen.querySelector('.back-btn').addEventListener('click', () => {
+        showScreen(werewolfGameState.chatId ? 'chat-interface-screen' : 'home-screen');
+    });
+    appScreen.querySelector('#start-werewolf-game-btn').addEventListener('click', initializeWerewolfGame);
+}
+
+/**
+ * 【全新 | 渲染函数】渲染狼人杀游戏主界面
+ */
+function renderWerewolfGameView() {
+    const appScreen = document.getElementById('werewolf-app-screen');
+    
+    // 1. 动态构建游戏界面的HTML结构
+    appScreen.innerHTML = `
+        <div class="header">
+            <span id="werewolf-game-title">狼人杀</span>
+            <div class="header-actions">
+                <span class="action-btn" id="werewolf-retry-btn" title="重试上一步AI操作" style="display: none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+                    </svg>
+                </span>
+                <span class="action-btn" id="exit-werewolf-game-btn">退出</span>
+            </div>
+        </div>
+        <div id="werewolf-player-grid"></div>
+        <div id="werewolf-log" class="list-container"></div>
+        <div id="werewolf-action-bar">
+            <div id="chat-input-main-row" style="width: 100%;">
+                <textarea id="werewolf-user-input" rows="1" placeholder="轮到你发言了..."></textarea>
+                <div id="input-actions-wrapper" style="gap: 5px;">
+                    <button id="werewolf-wait-reply-btn" style="display: none;">等待回应</button>
+                    <button id="werewolf-finish-speech-btn" style="display: none;">结束发言</button>
+                    <button id="werewolf-next-step-btn" class="form-button" style="margin-top:0; display: none;">下一步</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 2. 绑定新界面的事件
+    appScreen.querySelector('#exit-werewolf-game-btn').addEventListener('click', async () => {
+        const confirmed = await showCustomConfirm('退出游戏', '确定要退出当前这局狼人杀吗？游戏进度将不会被保存。', {confirmButtonClass: 'btn-danger'});
+        if (confirmed) {
+            werewolfGameState.isActive = false;
+            openWerewolfApp(werewolfGameState.chatId ? 'group' : 'global'); // 返回大厅
+        }
+    });
+    appScreen.querySelector('#werewolf-retry-btn').addEventListener('click', handleWerewolfRetry);
+}
 /**
          * 【V3.0 | 已添加女巫守卫】初始化一局新的狼人杀游戏
          */
@@ -36483,7 +36543,7 @@ async function openWerewolfLobby(mode) {
                 return;
             }
 
-            document.getElementById('werewolf-lobby-modal').classList.remove('visible');
+            
             await showCustomAlert('正在发牌...', '游戏即将开始，正在为各位玩家分配身份...');
 
             for (let i = roles.length - 1; i > 0; i--) {
@@ -36543,10 +36603,12 @@ async function openWerewolfLobby(mode) {
 
             const myPlayer = werewolfGameState.players.find(p => p.id === 'user');
 
-            renderWerewolfScreen();
-            showScreen('werewolf-game-screen');
-            
-            showMyRole(myPlayer.role);
+    // 【核心修改】渲染游戏界面，而不是切换屏幕
+    renderWerewolfGameView(); 
+    // 渲染游戏界面的初始内容
+    renderWerewolfScreen(); 
+    
+    showMyRole(myPlayer.role);
         }
 
 // ▼▼▼ 【V2.1 | 跨天显示修复版】请用这个全新的函数，完整替换旧的 renderWerewolfScreen ▼▼▼
@@ -42537,10 +42599,10 @@ document.getElementById('time-zone-search-input').addEventListener('input', (e) 
     
 // 游戏小屋入口
 // (这个已经在HTML的onclick里处理了, 但最好也在这里暴露一下函数)
-window.openWerewolfLobby = openWerewolfLobby;
+window.openWerewolfApp = openWerewolfApp;
 
 // 聊天工具栏入口
-document.getElementById('werewolf-game-btn').addEventListener('click', () => openWerewolfLobby('group'));
+document.getElementById('werewolf-game-btn').addEventListener('click', () => openWerewolfApp('group'));
 
 // 大厅按钮
 document.getElementById('cancel-werewolf-lobby-btn').addEventListener('click', () => {
@@ -42843,7 +42905,28 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 <!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-<!-- ▼▼▼ 【全新】狼人杀夜晚刀人弹窗 ▼▼▼ -->
+<!-- ▼▼▼ 【全新V3.0 | App化改造】这是狼人杀App的【全部HTML结构】，请完整粘贴 ▼▼▼ -->
+
+<!-- 1. 狼人杀App主屏幕 (所有视图和弹窗都在这里) -->
+<div id="werewolf-app-screen" class="screen">
+    <!-- 这个容器的内容将由JS动态填充为“大厅”或“游戏界面” -->
+</div>
+
+<!-- 2. 所有游戏相关的弹窗，现在都作为主屏幕的子元素 -->
+
+<!-- 角色身份揭示弹窗 -->
+<div id="werewolf-role-modal" class="modal">
+    <div class="modal-content" style="width: 280px; height: auto; text-align: center; padding: 20px;">
+        <h3 id="werewolf-role-title" style="margin-top: 0;">你的身份是</h3>
+        <div id="werewolf-role-card">
+            <h2 id="werewolf-role-name"></h2>
+            <p id="werewolf-role-description"></p>
+        </div>
+        <button id="werewolf-role-confirm-btn" class="form-button">我准备好了</button>
+    </div>
+</div>
+
+<!-- 狼人刀人弹窗 -->
 <div id="werewolf-kill-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span>狼人请选择刀人对象</span></div>
@@ -42854,69 +42937,8 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
         </div>
     </div>
 </div>
-<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-<div id="werewolf-lobby-modal" class="modal">
-    <div class="modal-content" style="height: 80%;">
-        <div class="modal-header">
-            <span>选择玩家开始狼人杀</span>
-        </div>
-        <div class="modal-body" id="werewolf-player-selection-list" style="padding: 0;">
-            </div>
-        <div class="modal-footer">
-            <button class="cancel" id="cancel-werewolf-lobby-btn">取消</button>
-            <button class="save" id="start-werewolf-game-btn">开始游戏</button>
-        </div>
-    </div>
-</div>
 
-<!-- ▼▼▼ 【全新V2.0 | 交互修复版】请用这整块代码，完整替换旧的 werewolf-game-screen ▼▼▼ -->
-<div id="werewolf-screen" class="screen">
-    <div class="header">
-        <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
-        <span id="werewolf-game-title">狼人杀</span>
-        <div class="header-actions">
-            <span class="action-btn" id="werewolf-retry-btn" title="重试上一步AI操作" style="display: none;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
-                    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
-                </svg>
-            </span>
-            <span class="action-btn" id="exit-werewolf-game-btn">退出</span>
-        </div>
-    </div>
-
-    <div class="list-container" style="display: flex; flex-direction: column; background-color: #2c2c2e; color: white;">
-        <div id="werewolf-player-grid">
-            </div>
-        <div id="werewolf-log">
-            </div>
-    </div>
-
-    <div id="werewolf-action-bar">
-        <div id="chat-input-main-row" style="width: 100%;">
-            <textarea id="werewolf-user-input" rows="1" placeholder="轮到你发言了..."></textarea>
-            <div id="input-actions-wrapper" style="gap: 5px;">
-                <button id="werewolf-wait-reply-btn" class="action-button" style="display: none; background-color: #007bff; height: 40px; padding: 0 10px; font-size: 13px;">等待回应</button>
-                <button id="werewolf-finish-speech-btn" class="action-button" style="display: none; background-color: var(--accent-color); height: 40px; padding: 0 10px; font-size: 13px;">结束发言</button>
-                <button id="werewolf-next-step-btn" class="form-button" style="margin-top:0; display: none;">下一步</button>
-            </div>
-        </div>
-    </div>
-</div>
-        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
-
-<div id="werewolf-role-modal" class="modal">
-    <div class="modal-content" style="width: 280px; height: auto; text-align: center; padding: 20px;">
-        <h3 id="werewolf-role-title" style="margin-top: 0;">你的身份是</h3>
-        <div id="werewolf-role-card" style="margin: 15px 0;">
-            <!-- 【核心修复】在这里添加了缺失的 h2 和 p 标签 -->
-            <h2 id="werewolf-role-name" style="margin: 0 0 10px 0;"></h2>
-            <p id="werewolf-role-description" style="font-size: 14px; line-height: 1.6; color: #555; margin: 0;"></p>
-        </div>
-        <button id="werewolf-role-confirm-btn" class="form-button">我准备好了</button>
-    </div>
-</div>
-
+<!-- 预言家查人弹窗 -->
 <div id="werewolf-prophet-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span>预言家请选择查验对象</span></div>
@@ -42927,30 +42949,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 
-<div id="werewolf-hunter-modal" class="modal">
-     <div class="modal-content" style="height: 70%;">
-        <div class="modal-header"><span>猎人请选择开枪对象</span></div>
-        <div class="modal-body" id="werewolf-hunter-selection-list" style="padding: 0;"></div>
-        <div class="modal-footer">
-             <button class="save btn-danger" id="confirm-hunter-shot-btn">确认开枪</button>
-        </div>
-    </div>
-</div>
-
-<!-- ▼▼▼ 【全新】这是你缺失的“投票”弹窗，请粘贴到此处 ▼▼▼ -->
-<div id="werewolf-vote-modal" class="modal">
-    <div class="modal-content" style="height: 70%;">
-        <div class="modal-header"><span>请投票放逐一名玩家</span></div>
-        <div class="modal-body" id="werewolf-vote-selection-list" style="padding: 0;"></div>
-        <div class="modal-footer">
-             <button class="save" id="confirm-vote-btn">确认投票</button>
-        </div>
-    </div>
-</div>
-<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-<!-- ▼▼▼ 【全新V2.0】这是你缺失的所有狼人杀角色操作弹窗，请完整粘贴 ▼▼▼ -->
-
-<!-- 1. 守卫选择弹窗 -->
+<!-- 守卫守护弹窗 -->
 <div id="werewolf-guard-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span>守卫请选择今晚要守护的玩家</span></div>
@@ -42961,13 +42960,11 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 
-<!-- 2. 女巫操作弹窗 (信息提示 + 毒人选择) -->
+<!-- 女巫操作弹窗 -->
 <div id="werewolf-witch-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span id="witch-modal-title">女巫请睁眼</span></div>
-        <div class="modal-body" id="werewolf-witch-selection-list" style="padding: 0;">
-            <!-- 救人或毒人选项将在这里显示 -->
-        </div>
+        <div class="modal-body" id="werewolf-witch-selection-list" style="padding: 0;"></div>
         <div class="modal-footer">
              <button class="cancel" id="witch-do-nothing-btn">什么都不做</button>
              <button class="save btn-danger" id="confirm-witch-poison-btn" style="display: none;">确认用毒</button>
@@ -42975,7 +42972,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 
-<!-- 3. 猎人开枪弹窗 (之前缺失) -->
+<!-- 猎人开枪弹窗 -->
 <div id="werewolf-hunter-modal" class="modal">
      <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span>猎人请选择开枪对象</span></div>
@@ -42986,7 +42983,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 
-<!-- 4. 投票弹窗 (之前缺失) -->
+<!-- 投票弹窗 -->
 <div id="werewolf-vote-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header"><span>请投票放逐一名玩家</span></div>
@@ -42997,22 +42994,18 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
     </div>
 </div>
 
-<!-- ▼▼▼ 【全新V2.0 | 已添加身份公布】请用这整块代码，完整替换旧的 werewolf-game-over-modal ▼▼▼ -->
+<!-- 游戏结束弹窗 -->
 <div id="werewolf-game-over-modal" class="modal">
     <div class="modal-content" style="width: 300px; height: auto; text-align: center; padding: 20px;">
         <h2 id="werewolf-game-over-title">游戏结束</h2>
         <p id="werewolf-game-over-reason" style="font-size: 16px; margin: 20px 0;"></p>
-        
-        <!-- 【【【核心新增：身份公布列表】】】 -->
-        <div id="werewolf-role-reveal-list" style="max-height: 250px; overflow-y: auto; margin: 20px 0; border-top: 1px solid #444; padding-top: 10px;">
-            <!-- 玩家身份将由JS动态生成在这里 -->
-        </div>
-        
-        <button id="werewolf-game-over-close-btn" class="form-button">返回大厅</button>
-      <button id="manual-werewolf-summary-btn" class="form-button form-button-secondary" style="margin-top: 10px;">手动总结记忆</button>
+        <div id="werewolf-role-reveal-list" style="max-height: 250px; overflow-y: auto; margin: 20px 0; border-top: 1px solid #444; padding-top: 10px;"></div>
+        <button id="manual-werewolf-summary-btn" class="form-button form-button-secondary" style="margin-top: 10px;">手动总结记忆</button>
+        <button id="werewolf-game-over-close-btn" class="form-button" style="margin-top: 10px;">返回大厅</button>
     </div>
 </div>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
+<!-- ▲▲▲ 狼人杀App的HTML结构结束 ▲▲▲ -->
 
 </body>
 </html>
