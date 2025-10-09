@@ -9419,17 +9419,17 @@ input, textarea, select {
     text-decoration: line-through;
 }
 
-/* 游戏日志/对话区域 */
+/* ▼▼▼ 【问题修复】请用这整块新代码，替换旧的 #werewolf-log 样式 ▼▼▼ */
 #werewolf-log {
     padding: 15px;
     background: none;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex-grow: 1;      /* 核心修复1：让日志区填满所有剩余空间 */
-    overflow-y: auto; 
-    min-height: 0;     
+    /* --- 核心修复：添加下面这一行 --- */
+    min-height: 0; 
 }
+/* ▲▲▲ 替换结束 ▲▲▲ */
 .werewolf-log-entry {
     background-color: rgba(255, 255, 255, 0.08);
     padding: 8px 12px;
@@ -9552,6 +9552,21 @@ input, textarea, select {
         }
 
         /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【狼人杀页面布局终极修复】▼▼▼ */
+
+#werewolf-log {
+    /* 保持：让日志区填满所有剩余空间 */
+    flex-grow: 1;      
+    
+    /* 保持：当内容超出时，允许日志区自己滚动 */
+    overflow-y: auto;  
+    
+    /* 核心修复：允许此Flex项目收缩至小于其内容尺寸，
+       这是解决“Flex子元素撑破父容器”问题的关键技巧。 */
+    min-height: 0;     
+}
+
+/* ▲▲▲ 修复结束 ▲▲▲ */
     </style>
 </head>
 <body>
