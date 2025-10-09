@@ -9377,17 +9377,11 @@ input, textarea, select {
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
 /* ▼▼▼ 【全新】狼人杀游戏功能样式 ▼▼▼ */
 
-/* ▼▼▼ 【V4.0 | iPhone 底部安全区终极修复版】狼人杀游戏功能样式 ▼▼▼ */
-
-/* 1. 游戏主屏幕布局 (核心修改) */
+/* 游戏主屏幕布局 */
 #werewolf-game-screen {
     background-color: #2c2c2e; /* 深邃的背景，营造氛围 */
     color: white;
-    /* 关键：将屏幕设为相对定位，作为底部操作栏的“锚点” */
-    //position: relative; 
 }
-
-/* 2. 玩家头像区 (保持不变) */
 #werewolf-player-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
@@ -9415,6 +9409,7 @@ input, textarea, select {
     font-weight: 500;
     text-shadow: 0 1px 2px black;
 }
+/* 死亡玩家的样式 */
 .werewolf-player-avatar.dead img {
     filter: grayscale(100%);
     border-color: #ff3b30;
@@ -9424,15 +9419,13 @@ input, textarea, select {
     text-decoration: line-through;
 }
 
-/* 3. 游戏日志/对话区域 (核心修改) */
+/* 游戏日志/对话区域 */
 #werewolf-log {
     padding: 15px;
     background: none;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    /* 关键：增加底部的内边距，为悬浮的操作栏留出足够的空间 */
-    padding-bottom: 90px;
 }
 .werewolf-log-entry {
     background-color: rgba(255, 255, 255, 0.08);
@@ -9451,27 +9444,19 @@ input, textarea, select {
     font-weight: bold;
 }
 
-/* 4. 底部操作栏 (核心修改) */
+/* 底部操作栏 */
 #werewolf-action-bar {
-    /* 关键：改为绝对定位，将其“钉”在屏幕底部 */
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    
-    /* 关键：现在这个 padding-bottom 会正确地将输入框从“小黑条”处顶上来 */
     padding: 10px 15px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    
-    /* (其他样式保持不变或微调) */
     background-color: rgba(0,0,0,0.3);
     flex-shrink: 0;
     text-align: center;
-    box-sizing: border-box; /* 确保 padding 计算正确 */
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* 增加分割线，更美观 */
+}
+#werewolf-next-step-btn {
+    width: 100%;
 }
 
-/* 5. 角色揭示卡片等其他样式 (保持不变) */
+/* 角色揭示卡片样式 */
 #werewolf-role-card {
     background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
     border: 1px solid #666;
@@ -9489,6 +9474,8 @@ input, textarea, select {
     font-size: 14px;
     line-height: 1.6;
 }
+
+/* 选择列表的通用样式 (用于查人、投票等) */
 .werewolf-selection-item {
     display: flex;
     align-items: center;
@@ -9562,21 +9549,6 @@ input, textarea, select {
         }
 
         /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
-/* ▼▼▼ 【狼人杀页面布局终极修复】▼▼▼ */
-
-#werewolf-log {
-    /* 保持：让日志区填满所有剩余空间 */
-    flex-grow: 1;      
-    
-    /* 保持：当内容超出时，允许日志区自己滚动 */
-    overflow-y: auto;  
-    
-    /* 核心修复：允许此Flex项目收缩至小于其内容尺寸，
-       这是解决“Flex子元素撑破父容器”问题的关键技巧。 */
-    min-height: 0;     
-}
-
-/* ▲▲▲ 修复结束 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -11268,7 +11240,39 @@ input, textarea, select {
         <button id="douban-send-comment-btn" class="comment-send-btn">发送</button>
     </div>
 </div>
-
+        <div id="werewolf-game-screen" class="screen">
+            <div class="header">
+                <span id="werewolf-game-title">狼人杀</span>
+                <div class="header-actions">
+<span class="action-btn" id="werewolf-retry-btn" title="重试上一步AI操作" style="display: none;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
+        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+    </svg>
+</span>
+                    <span class="action-btn" id="exit-werewolf-game-btn">退出</span>
+                </div>
+            </div>
+            <!-- 玩家头像区 (保持不变) -->
+            <div id="werewolf-player-grid"></div>
+            <!-- 游戏日志/对话区 (保持不变) -->
+            <div id="werewolf-log" class="list-container"></div>
+            
+            <!-- 【核心修改】全新的、常驻的底部操作栏 -->
+            <div id="werewolf-action-bar">
+                <div id="chat-input-main-row" style="width: 100%;">
+                    <textarea id="werewolf-user-input" rows="1" placeholder="轮到你发言了..."></textarea>
+                    <div id="input-actions-wrapper" style="gap: 5px;">
+                        <!-- 发言阶段的按钮 -->
+                        <button id="werewolf-wait-reply-btn" class="action-button" style="display: none; background-color: #007bff; height: 40px; padding: 0 10px; font-size: 13px;">等待回应</button>
+                        <button id="werewolf-finish-speech-btn" class="action-button" style="display: none; background-color: var(--accent-color); height: 40px; padding: 0 10px; font-size: 13px;">结束发言</button>
+                        <!-- 非发言阶段的按钮 -->
+                        <button id="werewolf-next-step-btn" class="form-button" style="margin-top:0; display: none;">下一步</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 <!-- =================================================================== -->
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
 <!-- =================================================================== -->
@@ -42862,39 +42866,7 @@ document.getElementById('manual-werewolf-summary-btn').addEventListener('click',
 </div>
 
 <!-- ▼▼▼ 【全新V2.0 | 交互修复版】请用这整块代码，完整替换旧的 werewolf-game-screen ▼▼▼ -->
-        <div id="werewolf-game-screen" class="screen">
-            <div class="header">
-                <span id="werewolf-game-title">狼人杀</span>
-                <div class="header-actions">
-<span class="action-btn" id="werewolf-retry-btn" title="重试上一步AI操作" style="display: none;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 11A8.1 8.1 0 0 0 4.5 9M4 5v4h4"></path>
-        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
-    </svg>
-</span>
-                    <span class="action-btn" id="exit-werewolf-game-btn">退出</span>
-                </div>
-            </div>
-            <!-- 玩家头像区 (保持不变) -->
-            <div id="werewolf-player-grid"></div>
-            <!-- 游戏日志/对话区 (保持不变) -->
-            <div id="werewolf-log" class="list-container"></div>
-            
-            <!-- 【核心修改】全新的、常驻的底部操作栏 -->
-            <div id="werewolf-action-bar">
-                <div id="chat-input-main-row" style="width: 100%;">
-                    <textarea id="werewolf-user-input" rows="1" placeholder="轮到你发言了..."></textarea>
-                    <div id="input-actions-wrapper" style="gap: 5px;">
-                        <!-- 发言阶段的按钮 -->
-                        <button id="werewolf-wait-reply-btn" class="action-button" style="display: none; background-color: #007bff; height: 40px; padding: 0 10px; font-size: 13px;">等待回应</button>
-                        <button id="werewolf-finish-speech-btn" class="action-button" style="display: none; background-color: var(--accent-color); height: 40px; padding: 0 10px; font-size: 13px;">结束发言</button>
-                        <!-- 非发言阶段的按钮 -->
-                        <button id="werewolf-next-step-btn" class="form-button" style="margin-top:0; display: none;">下一步</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
 
 <div id="werewolf-role-modal" class="modal">
     <div class="modal-content" style="width: 280px; height: auto; text-align: center; padding: 20px;">
