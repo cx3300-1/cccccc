@@ -9549,6 +9549,44 @@ input, textarea, select {
         }
 
         /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【狼人杀界面终极全屏修复】 ▼▼▼ */
+
+/* 1. 强制狼人杀主游戏屏幕占据整个屏幕 */
+#werewolf-game-screen {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background-color: #2c2c2e !important;
+}
+
+/* 2. 当狼人杀屏幕被激活时，赋予它最高的层级 */
+#werewolf-game-screen.active {
+    z-index: 100 !important;
+}
+
+/* 3. 将所有狼人杀相关的“弹窗”也强制变为全屏样式 */
+#werewolf-lobby-modal .modal-content,
+#werewolf-role-modal .modal-content,
+#werewolf-game-over-modal .modal-content,
+#werewolf-prophet-modal .modal-content,
+#werewolf-hunter-modal .modal-content,
+#werewolf-vote-modal .modal-content,
+#werewolf-kill-modal .modal-content,
+#werewolf-guard-modal .modal-content,
+#werewolf-witch-modal .modal-content {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* ▲▲▲ 【修复代码粘贴结束】 ▲▲▲ */
     </style>
 </head>
 <body>
@@ -13546,6 +13584,18 @@ window.db = db;
                 // ===================================================================
         
                 function showScreen(screenId) {
+    // 1. 【核心修改】先强制隐藏所有屏幕
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+    });
+
+    // 2. 找到要显示的目标屏幕
+    const screenToShow = document.getElementById(screenId);
+    
+    // 3. 如果找到了，再将其激活显示
+    if (screenToShow) {
+        screenToShow.classList.add('active');
+    }
                     if (screenId === 'chat-list-screen') {
                         window.renderChatListProxy(); 
                         switchToChatListView('messages-view');
