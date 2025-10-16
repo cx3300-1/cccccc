@@ -10112,6 +10112,89 @@ input, textarea, select {
     text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
 /* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
+/* ▼▼▼ 【全新】模拟手机外框功能样式 ▼▼▼ */
+
+/* 1. 默认情况下，外框是不可见的，让 #phone-screen 行为和以前一样 */
+#phone-frame {
+    width: 100%;
+    height: 100%;
+}
+
+/* ▼▼▼ 【V2.0 | 响应式修复版】请用这一整块全新的CSS，完整替换旧的 body.simulate-phone-mode 相关样式 ▼▼▼ */
+
+/* 1. 居中容器 (保持不变) */
+body.simulate-phone-mode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* 2. 【核心重构】响应式的手机外框 */
+body.simulate-phone-mode #phone-frame {
+    /* 核心修改1：使用响应式尺寸，让手机高度始终为浏览器窗口的90% */
+    height: 90vh; 
+    /* 同时设置一个最大高度，防止在超大屏幕上变得过大 */
+    max-height: 850px; 
+    
+    /* 核心修改2：锁定为iPhone 14/15 Pro Max的宽高比，实现“iPhone 16”的修长感 */
+    aspect-ratio: 430 / 932;
+    
+    /* 核心修改3：边框颜色改回深空灰，更具质感 */
+    background-color: #1c1c1e;
+    
+    /* 核心修改4：减小内边距，模拟更窄的边框 */
+    padding: 10px;
+    
+    border-radius: 55px; /* 保持大圆角 */
+    position: relative;
+    
+    /* 核心修改5：更新阴影，使其更有立体感 */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 
+                inset 0 2px 4px rgba(255, 255, 255, 0.08),
+                inset 0 -5px 10px rgba(0, 0, 0, 0.4);
+
+    display: flex;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ▼▼▼ 这是您需要替换的代码 ▼▼▼ */
+body.simulate-phone-mode #phone-frame::before {
+    content: '';
+    position: absolute;
+    /* 核心修改1：增加顶部距离，让它“悬浮”起来 */
+    top: 24px; 
+    left: 50%;
+    transform: translateX(-50%);
+    /* 核心修改2：调整尺寸，使其更像灵动岛的药丸形状 */
+    width: 120px;
+    height: 28px;
+    /* 核心修改3：背景变为深灰色/黑色 */
+    background-color: #1c1c1e; 
+    /* 核心修改4：圆角改为完全的半圆形，形成药丸外观 */
+    border-radius: 20px; 
+    z-index: 100;
+    /* 核心修改5：移除之前白色刘海的内阴影 */
+    box-shadow: none; 
+}
+
+/* 4. 【核心重构】内部屏幕，现在会自适应填充外框 */
+body.simulate-phone-mode #phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 45px; /* 更匹配外框的圆角 */
+    overflow: hidden;
+    position: relative;
+    background-color: #fff; /* 为屏幕添加一个默认背景色 */
+}
+
+/* 5. (可选) 隐藏原始 body 的滚动条 */
+body.simulate-phone-mode,
+body.simulate-phone-mode html {
+    overflow: hidden;
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
 /* ▼▼▼ Paste this entire block at the end of your <style> section ▼▼▼ */
 
 /* === 【V2.0 | Authentic iOS Status Bar】 === */
@@ -10261,6 +10344,7 @@ input, textarea, select {
     </style>
 </head>
 <body>
+    <div id="phone-frame">
     <div id="phone-screen">
 <!-- ▼▼▼ 这是您需要替换的HTML代码 ▼▼▼ -->
 <div id="status-bar">
@@ -11758,6 +11842,18 @@ input, textarea, select {
                 
                 <!-- 其他设置 -->
                 <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
+<div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+    <label for="simulate-phone-toggle" style="margin-bottom: 0;">
+        模拟手机外框
+        <p style="font-size: 12px; font-weight: normal; color: #999; margin-top: 5px;">
+            在电脑端开启以获得更佳的沉浸式体验。
+        </p>
+    </label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="simulate-phone-toggle">
+        <span class="slider"></span>
+    </label>
+</div>
                 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
                     <label for="theme-toggle-switch" style="margin-bottom: 0;">夜间模式</label>
                     <label class="toggle-switch">
@@ -15957,6 +16053,7 @@ async function loadAllDataFromDB() {
         widgetData: {},
         globalChatBackground: '',
         enableAiDrawing: true,
+    simulatePhoneMode: false, 
     chatActionButtonsOrder: null,
     shoppingCategoryCount: 3,
     shoppingProductCount: 8,
@@ -15965,7 +16062,9 @@ async function loadAllDataFromDB() {
     state.globalSettings = { ...defaultGlobalSettings, ...(loadedGlobalSettings || {}) };
     state.globalSettings.appIcons = { ...defaultGlobalSettings.appIcons, ...(state.globalSettings.appIcons || {}) };
     state.globalSettings.cphoneAppIcons = { ...defaultGlobalSettings.cphoneAppIcons, ...(state.globalSettings.cphoneAppIcons || {}) };
-
+if (typeof state.globalSettings.simulatePhoneMode === 'undefined') {
+    state.globalSettings.simulatePhoneMode = false;
+}
     chatsArr.forEach(chat => {
             if (typeof chat.settings.enableTimePerception === 'undefined') {
                 chat.settings.enableTimePerception = true;
@@ -41709,7 +41808,18 @@ async function handleWidgetImageChange(imageId) {
 window.handleWidgetImageChange = handleWidgetImageChange;
 
 /* ▲▲▲ 新增JS代码结束 ▲▲▲ */
-
+/**
+ * 【全新】根据设置应用或移除手机模拟模式
+ * @param {boolean} isEnabled - 是否启用模拟模式
+ */
+function applyPhoneSimulationMode(isEnabled) {
+    document.body.classList.toggle('simulate-phone-mode', isEnabled);
+    // 更新开关的状态，确保UI同步
+    const toggle = document.getElementById('simulate-phone-toggle');
+    if (toggle) {
+        toggle.checked = isEnabled;
+    }
+}
 
               // ===================================================================
                 // 4. 初始化函数 init()
@@ -41945,6 +42055,7 @@ window.openNpcEditor = openNpcEditor; // <-- 新增这一行
                     window.renderWorldBookScreenProxy = renderWorldBookScreen;
         
                     await loadAllDataFromDB();
+applyPhoneSimulationMode(state.globalSettings.simulatePhoneMode);
                     applyStatusBarVisibility(); // <-- 新增这一行
                     // ▼▼▼ 【核心】在这里添加下面这行新代码 ▼▼▼
                     await migrateOldRedPacketData();
@@ -46700,7 +46811,14 @@ document.getElementById('delete-selected-products-btn').addEventListener('click'
         await showCustomAlert("成功", "选中的商品已成功删除。");
     }
 });
-
+document.getElementById('simulate-phone-toggle').addEventListener('change', (e) => {
+    const isEnabled = e.target.checked;
+    // 直接调用应用函数，它会处理UI变化
+    applyPhoneSimulationMode(isEnabled);
+    
+    // 将新设置保存到 state 中，等待用户点击“保存”按钮时统一写入数据库
+    state.globalSettings.simulatePhoneMode = isEnabled;
+});
 
 
 
@@ -47057,6 +47175,7 @@ document.getElementById('delete-selected-products-btn').addEventListener('click'
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+    </div>
 <div id="reading-library-modal" class="modal">
     <div class="modal-content" style="height: 70%;">
         <div class="modal-header">
