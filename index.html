@@ -14195,32 +14195,38 @@ let readingState = {}; // { chatId: { isActive, isMinimized, title, ... } }
             });
         }
         // ▲▲▲ 替换结束 ▲▲▲
-// ▼▼▼ 在这里粘贴下面的新函数 ▼▼▼
+// ▼▼▼ 从这里开始替换 ▼▼▼
 
 /**
- * 【全新】发送一条测试用的系统通知横幅
+ * 【全新 V2.0 | 支持延迟发送】发送一条测试用的系统通知横幅
  */
-function sendTestNotification() {
-    // 检查浏览器是否支持
+async function sendTestNotification() {
+    // 1. 检查浏览器是否支持
     if (!("Notification" in window)) {
         showCustomAlert("功能不支持", "抱歉，您的浏览器不支持桌面通知功能。");
         return;
     }
 
-    // 检查权限是否已开启
+    // 2. 检查权限是否已开启
     if (Notification.permission === 'granted') {
-        // 如果已开启，则直接发送通知
-        new Notification("EPhone 测试通知", {
-            body: "如果您能看到这条横幅，说明系统推送功能工作正常！",
-            icon: state.qzoneSettings.avatar || defaultAvatar // 使用您的头像作为图标
-        });
+        // 如果权限已开启，先给一个即时反馈
+        await showCustomAlert("测试请求已发送", "请在5秒内【立即】返回手机主屏幕或锁屏，以查看系统横幅通知。");
+
+        // 3. 【核心修改】使用 setTimeout 延迟5秒后再发送通知
+        setTimeout(() => {
+            new Notification("EPhone 推送功能测试", {
+                body: "如果您能看到这条横幅，说明系统推送功能工作正常！",
+                icon: state.qzoneSettings.avatar || defaultAvatar // 使用您的头像作为图标
+            });
+        }, 5000); // 5000毫秒 = 5秒
+
     } else {
-        // 如果未开启，则提示用户
+        // 如果未开启，则提示用户先开启权限
         showCustomAlert("权限不足", "请先点击“开启桌面通知权限”并允许通知，然后再进行测试。");
     }
 }
 
-// ▲▲▲ 新函数粘贴结束 ▲▲▲        
+// ▲▲▲ 替换到这里结束 ▲▲▲     
 function showCustomAlert(title, message) {
     return new Promise(resolve => {
         modalResolve = resolve;
