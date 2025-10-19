@@ -16069,72 +16069,76 @@ function formatTimestampForAI(timestamp) {
     const day = String(date.getDate());
     return `${year}年${month}月${day}日 ${timeString}`;
 }        
- // ▼▼▼ 【V2.0 | 浏览器通知增强版】请用这个全新的函数，完整替换您现有的 showNotification 函数 ▼▼▼
+// ▼▼▼ 【V3.0 | 最终版】请用这个全新的函数，完整替换您现有的 showNotification 函数 ▼▼▼
 
 /**
- * 【增强版】显示通知：智能判断使用系统通知还是应用内横幅
- * @param {string} chatId - 消息所属的聊天ID
- * @param {string} messageContent - 消息的文本内容
+ * 【最终版 | 智能通知】显示通知：
+ * - 如果应用在后台 -> 调用系统通知
+ * - 如果应用在前台但不在当前聊天 -> 显示应用内横幅
+ * - 如果就在当前聊天 -> 什么都不做
  */
 function showNotification(chatId, messageContent) {
-    playNotificationSound(); // 播放提示音的逻辑保持不变
+    playNotificationSound(); // 播放提示音
 
     const chat = state.chats[chatId];
     if (!chat) return;
 
-    // --- ▼▼▼ 核心修改逻辑从这里开始 ▼▼▼ ---
-
-    // 1. 检查权限和浏览器标签页的可见性
-    const hasPermission = Notification.permission === "granted";
-    const isPageHidden = document.visibilityState === 'hidden';
-
-    // 2. 判断当前是否正在查看这个聊天的界面
+    // 检查当前是否正在查看这个聊天的界面
     const isViewingThisChat = 
         document.getElementById('chat-interface-screen').classList.contains('active') && 
         state.activeChatId === chatId;
 
-    // 3. 决定使用哪种通知
-    if (hasPermission && (isPageHidden || !isViewingThisChat)) {
-        // 【情况A：调用系统通知】
-        // 条件：用户已授权，并且 (页面在后台 或 用户不在当前聊天界面)
-        
-        console.log("触发系统桌面通知...");
-        
-        const title = chat.name;
-        const options = {
-            body: messageContent,
-            icon: chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar,
-            tag: chatId // 使用chatId作为标签，可以防止同一聊天的新消息刷屏
-        };
+    // 如果就在这个聊天里，就什么都不做
+    if (isViewingThisChat) {
+        return;
+    }
 
-        const notification = new Notification(title, options);
+    // --- 【核心逻辑】根据页面可见性决定通知类型 ---
 
-        // (可选) 为通知添加点击事件，点击后切换到对应的聊天
-        notification.onclick = function() {
-            window.focus(); // 切换回我们的应用
-            openChat(chatId);
-            notification.close();
-        };
+    // 如果页面在后台 (用户切换到了其他App)
+    if (document.visibilityState === 'hidden') {
+        // 检查是否已获得通知权限
+        if (Notification.permission === 'granted') {
+            console.log("正在尝试发送系统级通知...");
+            
+            const title = chat.name;
+            const options = {
+                body: messageContent,
+                icon: chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar || defaultAvatar,
+                tag: chatId, // 使用chatId作为标签，可以防止同一聊天的新消息刷屏
+                data: { chatId: chatId } // 将chatId存入，方便点击时使用
+            };
 
-    } else if (!isViewingThisChat) {
-        // 【情况B：调用应用内横幅】
-        // 条件：用户在应用内，但不在当前聊天界面 (这是您原来的逻辑)
-        
-        console.log("触发应用内横幅通知...");
-        
+            // 【【【这就是创建系统通知的核心代码！】】】
+            const notification = new Notification(title, options);
+
+            // 为通知添加点击事件，点击后切换回我们的应用并打开对应聊天
+            notification.onclick = function() {
+                window.focus(); // 切换回我们的应用
+                openChat(chatId);
+                notification.close();
+            };
+
+        } else {
+            console.warn("页面在后台，但没有通知权限，无法发送系统通知。");
+        }
+    } 
+    // 如果页面在前台，但用户在看别的界面
+    else {
+        // 这部分逻辑不变，依然显示应用内横幅
+        console.log("正在显示应用内横幅通知...");
         clearTimeout(notificationTimeout);
         const bar = document.getElementById('notification-bar');
         
-        document.getElementById('notification-avatar').src = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar;
+        document.getElementById('notification-avatar').src = chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar || defaultAvatar;
         document.getElementById('notification-content').querySelector('.name').textContent = chat.name;
         document.getElementById('notification-content').querySelector('.message').textContent = messageContent;
         
-        bar.classList.remove('visible');
-        void bar.offsetWidth;
-        bar.classList.add('visible');
-        
+        // 使用克隆节点技巧来重启CSS动画
         const newBar = bar.cloneNode(true);
         bar.parentNode.replaceChild(newBar, bar);
+        newBar.classList.add('visible');
+        
         newBar.addEventListener('click', () => {
             openChat(chatId);
             newBar.classList.remove('visible');
@@ -16144,11 +16148,9 @@ function showNotification(chatId, messageContent) {
             newBar.classList.remove('visible');
         }, 4000);
     }
-    // 【情况C：如果用户正在看这个聊天，则什么都不做】
-    // 因为 `appendMessage` 函数会自动把消息显示在屏幕上。
-
-    // --- ▲▲▲ 核心修改逻辑到此结束 ▲▲▲ ---
 }
+
+// ▲▲▲ 替换结束 ▲▲▲
         
                function updateClock() { 
     const now = new Date(); 
@@ -21841,23 +21843,20 @@ async function deleteTrack(index) { if (index < 0 || index >= musicState.playlis
                 
                 // ▲▲▲ 新函数粘贴结束 ▲▲▲
         
-        // ▼▼▼ 将这两个新函数粘贴到你的JS功能函数定义区 ▼▼▼
-        function startBackgroundSimulation() {
-            if (simulationIntervalId) return;
-            const intervalSeconds = state.globalSettings.backgroundActivityInterval || 60;
-            // 将旧的固定间隔 45000 替换为动态获取
-            simulationIntervalId = setInterval(runBackgroundSimulationTick, intervalSeconds * 1000); 
-    playSilentAudio();
-        }
-        
-        function stopBackgroundSimulation() {
-            if (simulationIntervalId) {
-                clearInterval(simulationIntervalId);
-                simulationIntervalId = null;
-            }
-    stopSilentAudio();
-        }
-        // ▲▲▲ 粘贴结束 ▲▲▲
+function startBackgroundSimulation() {
+    if (simulationIntervalId) return;
+    const intervalSeconds = state.globalSettings.backgroundActivityInterval || 60;
+    simulationIntervalId = setInterval(runBackgroundSimulationTick, intervalSeconds * 1000);
+    playSilentAudio(); // <-- 在这里添加这一行
+}
+
+function stopBackgroundSimulation() {
+    if (simulationIntervalId) {
+        clearInterval(simulationIntervalId);
+        simulationIntervalId = null;
+    }
+    stopSilentAudio(); // <-- 在这里添加这一行
+}
         
 // ▼▼▼ 【最终修复版】请用这个全新的函数，完整替换旧的 runBackgroundSimulationTick ▼▼▼
 /**
@@ -41223,6 +41222,8 @@ function updateReadingContextOnScroll() {
 }
 
 // ▲▲▲ 替换结束 ▲▲▲
+
+
 // ▼▼▼ 【全新】这是静音播放功能的核心函数 ▼▼▼
 
 /**
@@ -41257,6 +41258,7 @@ function stopSilentAudio() {
     }
 }
 
+// ▲▲▲ 新增函数结束 ▲▲▲
 // ▲▲▲ 新增函数粘贴结束 ▲▲▲
 async function playTtsAudio(bodyElement) {
     const text = decodeURIComponent(bodyElement.dataset.text);
