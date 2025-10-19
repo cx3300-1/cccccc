@@ -10912,9 +10912,14 @@ input, textarea, select {
     <p style="font-size: 12px; color: #666; background-color: #f0f0f0; padding: 10px; border-radius: 8px; margin-top: 5px; line-height: 1.6;">
         为了在应用切换到后台或锁屏后也能接收到新消息提醒 (尤其是在iPhone上)，您需要手动开启浏览器的通知权限。
     </p>
-    <button id="enable-notifications-btn" class="form-button form-button-secondary" style="margin-top: 10px;">
+<div style="display: flex; gap: 10px; margin-top: 10px;">
+    <button id="enable-notifications-btn" class="form-button form-button-secondary" style="margin-top: 0; flex: 1;">
         开启桌面通知权限
     </button>
+    <button id="test-notification-btn" class="form-button form-button-secondary" style="margin-top: 0; flex: 1;">
+        发送一条测试横幅
+    </button>
+</div>
 </div>
 <!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
 <hr style="margin: 30px 0; opacity: 0.3;">
@@ -14190,7 +14195,32 @@ let readingState = {}; // { chatId: { isActive, isMinimized, title, ... } }
             });
         }
         // ▲▲▲ 替换结束 ▲▲▲
-        
+// ▼▼▼ 在这里粘贴下面的新函数 ▼▼▼
+
+/**
+ * 【全新】发送一条测试用的系统通知横幅
+ */
+function sendTestNotification() {
+    // 检查浏览器是否支持
+    if (!("Notification" in window)) {
+        showCustomAlert("功能不支持", "抱歉，您的浏览器不支持桌面通知功能。");
+        return;
+    }
+
+    // 检查权限是否已开启
+    if (Notification.permission === 'granted') {
+        // 如果已开启，则直接发送通知
+        new Notification("EPhone 测试通知", {
+            body: "如果您能看到这条横幅，说明系统推送功能工作正常！",
+            icon: state.qzoneSettings.avatar || defaultAvatar // 使用您的头像作为图标
+        });
+    } else {
+        // 如果未开启，则提示用户
+        showCustomAlert("权限不足", "请先点击“开启桌面通知权限”并允许通知，然后再进行测试。");
+    }
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲        
 function showCustomAlert(title, message) {
     return new Promise(resolve => {
         modalResolve = resolve;
@@ -47021,7 +47051,7 @@ document.getElementById('save-appearance-preset-btn').addEventListener('click', 
 document.getElementById('delete-appearance-preset-btn').addEventListener('click', deleteAppearancePreset);
 // ▲▲▲ 新增结束 ▲▲▲
 document.getElementById('enable-notifications-btn').addEventListener('click', requestNotificationPermission);
-
+document.getElementById('test-notification-btn').addEventListener('click', sendTestNotification);
 
 
 
