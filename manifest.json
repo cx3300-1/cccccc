@@ -1,20 +1,48 @@
 {
   "name": "EPhone",
   "short_name": "EPhone",
+  "description": "聊天应用",
   "start_url": "./index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "scope": "/",
+  
+  "id": "/",
+  
+  "orientation": "portrait-primary",
+  
+  "categories": ["chat", "social", "entertainment"],
+
   "icons": [
     {
-      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1756312261242_qdqqd_g0eriz.jpeg",
+      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1758510900942_qdqqd_djw0z2.jpeg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1756312261242_qdqqd_g0eriz.jpeg",
+      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1758510900942_qdqqd_djw0z2.jpeg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1762117565860_qdqqd_9c1kbu.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "聊天列表界面"
+    },
+    {
+      "src": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1762117578280_qdqqd_m4r72t.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "聊天对话界面"
     }
   ]
 }
